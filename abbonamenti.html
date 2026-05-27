@@ -218,13 +218,13 @@ select.finput{appearance:none;-webkit-appearance:none}
 
   <!-- PAGE: OVERVIEW -->
   <div class="page on" id="pg-overview">
-    <div id="alertbox"></div>
     <div class="mgrid">
       <div class="metric"><div class="mlabel">Mensile</div><div class="mval" id="mv-monthly">—</div><div class="msub">spesa attiva</div></div>
       <div class="metric"><div class="mlabel">Annuale</div><div class="mval" id="mv-annual">—</div><div class="msub">proiezione</div></div>
       <div class="metric"><div class="mlabel">Attivi</div><div class="mval" id="mv-count">—</div><div class="msub" id="mv-paused"></div></div>
       <div class="metric"><div class="mlabel">Più costoso</div><div class="mval" id="mv-top" style="font-size:15px;padding-top:4px">—</div><div class="msub" id="mv-topcost"></div></div>
     </div>
+    <div id="alertbox"></div>
     <div class="card">
       <div class="ctitle">Per categoria</div>
       <div style="position:relative;height:200px"><canvas id="piechart"></canvas></div>
@@ -443,9 +443,12 @@ function findDups(){
     for(let j=i+1;j<active.length;j++){
       const a=active[i], b=active[j];
       if(a.cat!==b.cat) continue;
+      // Only flag if same icon (same type of service) AND costs similar
+      const sameIcon = a.icon===b.icon;
       const diff=Math.abs(mthly(a)-mthly(b));
       const avg=(mthly(a)+mthly(b))/2;
-      if(avg>1 && diff/avg<0.5) pairs.push([a.name, b.name]);
+      const verySimilarCost = avg>1 && diff/avg<0.1; // within 10%
+      if(sameIcon || verySimilarCost) pairs.push([a.id+'_'+b.id, a.name, b.name]);
     }
   }
   return pairs;
@@ -470,6 +473,13 @@ function showPage(name, idx){
 
 // ─── OVERVIEW ────────────────────────────────────────────────────────────────
 let pieChart=null;
+
+function dismissDup(key){
+  if(!cfg.dismissedDups) cfg.dismissedDups=[];
+  cfg.dismissedDups.push(key);
+  saveAll();
+  drawOverview();
+}
 
 function drawOverview(){
   const active=subs.filter(s=>!s.paused);
@@ -501,8 +511,9 @@ function drawOverview(){
       +'<div class="budgetbar"><div class="budgetfill" style="width:'+pct+'%;background:'+(over?'var(--red)':'var(--grn)')+'"></div></div></div></div>';
   }
   const dups=findDups();
-  dups.forEach(([a,b])=>{
-    html+='<div class="banner" style="background:var(--orabg)"><span style="font-size:inherit;color:var(--ora)">⚠</span><div class="bannertext">Possibile duplicato: <strong>'+a+'</strong> e <strong>'+b+'</strong></div></div>';
+  if(!cfg.dismissedDups) cfg.dismissedDups=[];
+  dups.filter(([key])=>!cfg.dismissedDups.includes(key)).forEach(([key,a,b])=>{
+    html+='<div class="banner" style="background:var(--orabg);align-items:center"><span style="font-size:18px;flex-shrink:0;color:var(--ora)">⚠</span><div class="bannertext" style="flex:1">Possibile duplicato: <strong>'+a+'</strong> e <strong>'+b+'</strong></div><button onclick="dismissDup(\''+key+'\')" style="background:none;border:none;font-size:20px;cursor:pointer;padding:0 0 0 8px;color:var(--tx3);line-height:1">✕</button></div>';
   });
   document.getElementById('alertbox').innerHTML=html;
 
