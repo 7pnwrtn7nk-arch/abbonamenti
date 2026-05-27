@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Abbonamenti">
+<meta name="theme-color" content="#f5f4f0">
+<title>Abbonamenti</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--bg:#f5f4f0;--surface:#ffffff;--surface2:#efefeb;--text:#1a1a18;--text2:#6b6b67;--text3:#a0a09c;--accent-light:#e8e7e2;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--danger:#c94040;--danger-bg:#fdf0f0;--warn:#b06a10;--warn-bg:#fdf3e7;--ok:#2a7a4a;--ok-bg:#edf7f1;--r:14px;--r-sm:8px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--nav-h:64px;--safe-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a18;--surface:#242422;--surface2:#2e2e2b;--text:#f0efe9;--text2:#9a9a94;--text3:#5a5a56;--accent-light:#2e2e2b;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--danger:#e06060;--danger-bg:#2d1e1e;--warn:#d08030;--warn-bg:#2d2215;--ok:#4aaa6a;--ok-bg:#162a20}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;overscroll-behavior:none}
+#app{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px)}
+.nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px}
+.nav-title{font-size:17px;font-weight:600;letter-spacing:-0.02em}
+.nav-btn{width:36px;height:36px;border-radius:50%;border:none;background:var(--surface2);color:var(--text);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--text3);font-family:var(--font);font-size:11px;padding-top:8px}
+.tab-btn i{font-size:22px}
+.tab-btn.active{color:var(--text)}
+.page{display:none;padding:16px}
+.page.active{display:block}
+.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.metric{background:var(--surface);border-radius:var(--r);padding:14px 16px;border:1px solid var(--border)}
+.metric-label{font-size:11px;color:var(--text2);font-weight:500;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px}
+.metric-value{font-size:24px;font-weight:600;letter-spacing:-0.03em;line-height:1}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.chart-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:20px}
+.chart-card-title{font-size:13px;font-weight:500;color:var(--text2);margin-bottom:14px}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin:20px 0 10px}
+.section-title:first-child{margin-top:0}
+.sub-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.sub-card:active{background:var(--surface2)}
+.sub-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sub-info{flex:1;min-width:0}
+.sub-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub-renewal{font-size:12px;color:var(--text3);margin-top:2px}
+.sub-right{text-align:right;flex-shrink:0}
+.sub-cost{font-size:15px;font-weight:600;font-family:var(--mono);letter-spacing:-0.02em}
+.sub-freq{font-size:11px;color:var(--text3);margin-top:2px}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;letter-spacing:0.02em}
+.badge-urgent{background:var(--danger-bg);color:var(--danger)}
+.badge-soon{background:var(--warn-bg);color:var(--warn)}
+.badge-ok{background:var(--ok-bg);color:var(--ok)}
+.badge-annual{background:var(--accent-light);color:var(--text2)}
+.renewal-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.renewal-row:last-child{border-bottom:none}
+.renewal-date-box{width:42px;height:42px;border-radius:10px;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.renewal-day{font-size:16px;font-weight:600;line-height:1;font-family:var(--mono)}
+.renewal-month{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-top:1px}
+.renewal-info{flex:1;min-width:0}
+.renewal-name{font-size:14px;font-weight:500}
+.renewal-tag{font-size:11px;color:var(--text3);margin-top:4px}
+.renewal-right{text-align:right;flex-shrink:0}
+.renewal-amount{font-size:14px;font-weight:600;font-family:var(--mono)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:90dvh;overflow-y:auto;padding:0 0 calc(20px + var(--safe-bottom))}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 16px}
+.modal-header{padding:0 20px 16px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:18px;font-weight:600;letter-spacing:-0.02em}
+.modal-sub{font-size:13px;color:var(--text2);margin-top:3px}
+.modal-body{padding:20px}
+.modal-detail-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.modal-detail-row:last-child{border-bottom:none}
+.modal-detail-label{font-size:13px;color:var(--text2)}
+.modal-detail-value{font-size:13px;font-weight:500}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.btn{flex:1;height:48px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border-color:transparent}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text2);margin-bottom:6px;display:block}
+.form-input{width:100%;height:46px;padding:0 14px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:15px;outline:none}
+.form-input:focus{border-color:var(--text)}
+.form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+select.form-input{appearance:none;-webkit-appearance:none}
+.color-picker-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.color-dot{width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+.empty{text-align:center;padding:48px 24px;color:var(--text3)}
+.empty i{font-size:48px;display:block;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.notif-banner{background:var(--warn-bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+.notif-banner i{color:var(--warn);font-size:18px;flex-shrink:0;margin-top:1px}
+.notif-text{font-size:13px;color:var(--text);line-height:1.5}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav class="nav">
+    <span class="nav-title" id="nav-title">Abbonamenti</span>
+    <button class="nav-btn" id="add-btn" onclick="openAddForm()" aria-label="Aggiungi"><i class="ti ti-plus"></i></button>
+  </nav>
+
+  <div class="page active" id="page-overview">
+    <div id="notif-container"></div>
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">Mensile</div><div class="metric-value" id="m-monthly">—</div><div class="metric-sub">spesa totale</div></div>
+      <div class="metric"><div class="metric-label">Annuale</div><div class="metric-value" id="m-annual">—</div><div class="metric-sub">proiezione</div></div>
+      <div class="metric"><div class="metric-label">Totale</div><div class="metric-value" id="m-count">—</div><div class="metric-sub">abbonamenti</div></div>
+      <div class="metric"><div class="metric-label">Più costoso</div><div class="metric-value" id="m-top" style="font-size:15px;padding-top:4px">—</div><div class="metric-sub" id="m-top-cost"></div></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Per categoria</div>
+      <div style="position:relative;height:200px"><canvas id="pieChart" role="img" aria-label="Ripartizione spese per categoria"></canvas></div>
+      <div class="chart-legend" id="chart-legend"></div>
+    </div>
+    <div class="section-title">Prossimi rinnovi</div>
+    <div id="upcoming-list"></div>
+  </div>
+
+  <div class="page" id="page-list"><div id="cat-list"></div></div>
+
+  <div class="page" id="page-calendar">
+    <div style="background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:4px 16px">
+      <div id="calendar-list"></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-add">
+    <div class="form-group"><label class="form-label">Nome servizio</label><input class="form-input" type="text" id="f-name" placeholder="es. Netflix"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Costo (€)</label><input class="form-input" type="number" id="f-cost" placeholder="9.99" step="0.01" min="0"></div>
+      <div class="form-group"><label class="form-label">Frequenza</label><select class="form-input" id="f-freq"><option value="monthly">Mensile</option><option value="annual">Annuale</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Prossimo rinnovo</label><input class="form-input" type="date" id="f-date"></div>
+    <div class="form-group"><label class="form-label">Categoria</label><select class="form-input" id="f-cat"><option value="intrattenimento">Intrattenimento</option><option value="ai">AI & Produttività</option><option value="cloud">Cloud & Utility</option><option value="fitness">Fitness & Salute</option><option value="telefonia">Telefonia</option><option value="finanza">Finanza</option><option value="altro">Altro</option></select></div>
+    <div class="form-group"><label class="form-label">Colore icona</label><div class="color-picker-row" id="color-picker"></div></div>
+    <div class="form-group"><label class="form-label">Icona</label><select class="form-input" id="f-icon"><option value="ti-device-tv">TV / Streaming</option><option value="ti-music">Musica</option><option value="ti-ball-football">Sport</option><option value="ti-brain">AI / Assistente</option><option value="ti-robot">Chatbot</option><option value="ti-microphone">Trascrizione</option><option value="ti-pencil">Design / Grafica</option><option value="ti-cloud">Cloud Storage</option><option value="ti-brand-apple">Apple</option><option value="ti-brand-google">Google</option><option value="ti-camera">Sicurezza</option><option value="ti-apple">Salute / Cibo</option><option value="ti-moon">Meditazione</option><option value="ti-phone">Telefonia</option><option value="ti-credit-card">Finanza / Banca</option><option value="ti-shopping-bag">Shopping</option><option value="ti-star">Altro</option></select></div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn" onclick="cancelAdd()">Annulla</button>
+      <button class="btn btn-primary" onclick="saveSub()">Salva</button>
+    </div>
+    <div id="delete-container" style="margin-top:12px;display:none">
+      <button class="btn btn-danger" style="width:100%" onclick="deleteCurrentSub()"><i class="ti ti-trash"></i> Elimina abbonamento</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="showPage('overview',0)" aria-label="Riepilogo"><i class="ti ti-chart-pie"></i><span>Riepilogo</span></button>
+  <button class="tab-btn" onclick="showPage('list',1)" aria-label="Lista"><i class="ti ti-list"></i><span>Lista</span></button>
+  <button class="tab-btn" onclick="showPage('calendar',2)" aria-label="Rinnovi"><i class="ti ti-calendar-event"></i><span>Rinnovi</span></button>
+</nav>
+
+<script>
+const CAT_COLORS={intrattenimento:'#D85A30',ai:'#7F77DD',cloud:'#378ADD',fitness:'#1D9E75',telefonia:'#BA7517',finanza:'#888780',altro:'#5DCAA5'};
+const CAT_LABELS={intrattenimento:'Intrattenimento',ai:'AI & Produttività',cloud:'Cloud & Utility',fitness:'Fitness & Salute',telefonia:'Telefonia',finanza:'Finanza',altro:'Altro'};
+const ICON_COLORS=[{bg:'#FAECE7',fg:'#D85A30'},{bg:'#EEEDFE',fg:'#534AB7'},{bg:'#E6F1FB',fg:'#185FA5'},{bg:'#E1F5EE',fg:'#0F6E56'},{bg:'#FAEEDA',fg:'#854F0B'},{bg:'#F1EFE8',fg:'#5F5E5A'},{bg:'#FBEAF0',fg:'#993556'},{bg:'#EAF3DE',fg:'#3B6D11'}];
+
+const DEFAULTS=[
+  {id:'1',name:'Netflix Premium',cost:19.99,freq:'monthly',renewal:'2026-06-16',cat:'intrattenimento',icon:'ti-device-tv',colorIdx:0},
+  {id:'2',name:'Amazon Prime',cost:49.90,freq:'annual',renewal:'2026-07-07',cat:'intrattenimento',icon:'ti-shopping-bag',colorIdx:0},
+  {id:'3',name:'DAZN Full',cost:52.49,freq:'monthly',renewal:'2026-06-25',cat:'intrattenimento',icon:'ti-ball-football',colorIdx:0},
+  {id:'4',name:'Wind (personale)',cost:15.98,freq:'monthly',renewal:'2026-06-05',cat:'telefonia',icon:'ti-phone',colorIdx:4},
+  {id:'5',name:'Yazio Pro',cost:29.90,freq:'annual',renewal:'2026-05-22',cat:'fitness',icon:'ti-apple',colorIdx:3},
+  {id:'6',name:'Apple One Famiglia',cost:25.95,freq:'monthly',renewal:'2026-05-30',cat:'cloud',icon:'ti-brand-apple',colorIdx:2},
+  {id:'7',name:'Balance Meditation',cost:44.99,freq:'annual',renewal:'2026-07-27',cat:'fitness',icon:'ti-moon',colorIdx:3},
+  {id:'8',name:'ChatGPT Plus',cost:22.99,freq:'monthly',renewal:'2026-05-22',cat:'ai',icon:'ti-robot',colorIdx:1},
+  {id:'9',name:'Claude Pro',cost:22.00,freq:'monthly',renewal:'2026-05-23',cat:'ai',icon:'ti-brain',colorIdx:1},
+  {id:'10',name:'Disney+ Premium',cost:15.99,freq:'monthly',renewal:'2026-06-02',cat:'intrattenimento',icon:'ti-device-tv',colorIdx:0},
+  {id:'11',name:'eufy Cloud',cost:3.99,freq:'monthly',renewal:'2026-06-15',cat:'cloud',icon:'ti-camera',colorIdx:2},
+  {id:'12',name:'iCloud+ 2TB',cost:9.99,freq:'monthly',renewal:'2026-06-01',cat:'cloud',icon:'ti-cloud',colorIdx:2},
+  {id:'13',name:'Morpholio Trace',cost:19.99,freq:'annual',renewal:'2027-01-19',cat:'ai',icon:'ti-pencil',colorIdx:1},
+  {id:'14',name:'Otter Premium',cost:99.99,freq:'annual',renewal:'2027-03-27',cat:'ai',icon:'ti-microphone',colorIdx:1},
+  {id:'15',name:'Google One',cost:19.99,freq:'annual',renewal:'2026-09-10',cat:'cloud',icon:'ti-brand-google',colorIdx:2},
+  {id:'16',name:'Paramount+',cost:7.99,freq:'monthly',renewal:'2026-06-13',cat:'intrattenimento',icon:'ti-device-tv',colorIdx:0},
+  {id:'17',name:'Revolut Metal',cost:15.99,freq:'monthly',renewal:'2026-05-28',cat:'finanza',icon:'ti-credit-card',colorIdx:5}
+];
+
+// Storage compatibile con Safari iOS su file://
+const STORAGE_KEY = 'abbonamenti_v3';
+function loadData() {
+  try {
+    // prova sessionStorage (funziona su file:// in Safari iOS)
+    const r = sessionStorage.getItem(STORAGE_KEY);
+    if (r) return JSON.parse(r);
+  } catch(e){}
+  try {
+    const r = localStorage.getItem(STORAGE_KEY);
+    if (r) return JSON.parse(r);
+  } catch(e){}
+  return null;
+}
+function saveData() {
+  const d = JSON.stringify(subs);
+  try { sessionStorage.setItem(STORAGE_KEY, d); } catch(e){}
+  try { localStorage.setItem(STORAGE_KEY, d); } catch(e){}
+}
+
+let subs = loadData() || JSON.parse(JSON.stringify(DEFAULTS));
+let pieChart = null;
+let editingId = null;
+let selectedColor = 0;
+let prevPageIdx = 0;
+
+function monthlyEq(s){ return s.freq==='monthly' ? s.cost : s.cost/12; }
+function daysUntil(ds){ const t=new Date(); t.setHours(0,0,0,0); const d=new Date(ds); d.setHours(0,0,0,0); return Math.round((d-t)/86400000); }
+const MONTHS_SHORT=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+const MONTHS_FULL=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+function fmtShort(ds){ const d=new Date(ds); return d.getDate()+' '+MONTHS_SHORT[d.getMonth()]; }
+function fmtFull(ds){ const d=new Date(ds); return d.getDate()+' '+MONTHS_FULL[d.getMonth()]+' '+d.getFullYear(); }
+function badge(days,freq){
+  if(freq==='annual') return '<span class="badge badge-annual">annuale</span>';
+  if(days<0) return '<span class="badge badge-urgent">scaduto</span>';
+  if(days===0) return '<span class="badge badge-urgent">oggi</span>';
+  if(days<=7) return '<span class="badge badge-urgent">'+days+'g</span>';
+  if(days<=14) return '<span class="badge badge-soon">'+days+'g</span>';
+  return '<span class="badge badge-ok">'+days+'g</span>';
+}
+
+function renderOverview(){
+  const total = subs.reduce((a,s)=>a+monthlyEq(s),0);
+  document.getElementById('m-monthly').textContent='€'+total.toFixed(2);
+  document.getElementById('m-annual').textContent='€'+Math.round(total*12).toLocaleString('it-IT');
+  document.getElementById('m-count').textContent=subs.length;
+  const top=subs.slice().sort((a,b)=>monthlyEq(b)-monthlyEq(a))[0];
+  if(top){document.getElementById('m-top').textContent=top.name;document.getElementById('m-top-cost').textContent='€'+top.cost.toFixed(2)+'/'+(top.freq==='monthly'?'mese':'anno');}
+
+  const urgents=subs.filter(s=>{const d=daysUntil(s.renewal);return d>=0&&d<=7;}).sort((a,b)=>daysUntil(a.renewal)-daysUntil(b.renewal));
+  const nc=document.getElementById('notif-container');
+  nc.innerHTML=urgents.length?'<div class="notif-banner"><i class="ti ti-bell-ringing"></i><div class="notif-text">Rinnovi imminenti (entro 7 giorni): <strong>'+urgents.map(s=>s.name).join(', ')+'</strong></div></div>':'';
+
+  const catT={};
+  subs.forEach(s=>{catT[s.cat]=(catT[s.cat]||0)+monthlyEq(s);});
+  const cats=Object.keys(catT);
+  const vals=cats.map(c=>+catT[c].toFixed(2));
+  const colors=cats.map(c=>CAT_COLORS[c]||CAT_COLORS.altro);
+  if(pieChart){pieChart.destroy();pieChart=null;}
+  pieChart=new Chart(document.getElementById('pieChart').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:cats.map(c=>CAT_LABELS[c]||c),datasets:[{data:vals,backgroundColor:colors,borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' €'+ctx.parsed.toFixed(2)+'/mese'}}}}
+  });
+  document.getElementById('chart-legend').innerHTML=cats.map((c,i)=>'<span class="legend-item"><span class="legend-dot" style="background:'+colors[i]+'"></span>'+( CAT_LABELS[c]||c)+'</span>').join('');
+
+  const upcoming=subs.slice().sort((a,b)=>new Date(a.renewal)-new Date(b.renewal)).slice(0,6);
+  const ul=document.getElementById('upcoming-list');
+  if(!upcoming.length){ul.innerHTML='<div class="empty"><i class="ti ti-calendar-off"></i><div class="empty-title">Nessun rinnovo</div></div>';return;}
+  ul.innerHTML=upcoming.map(s=>{
+    const days=daysUntil(s.renewal);
+    const d=new Date(s.renewal);
+    return '<div class="renewal-row" onclick="openDetail(\''+s.id+'\')"><div class="renewal-date-box"><span class="renewal-day">'+d.getDate()+'</span><span class="renewal-month">'+MONTHS_SHORT[d.getMonth()].toUpperCase()+'</span></div><div class="renewal-info"><div class="renewal-name">'+s.name+'</div><div class="renewal-tag">'+badge(days,s.freq)+'</div></div><div class="renewal-right"><div class="renewal-amount">€'+s.cost.toFixed(2)+'</div><div style="font-size:11px;color:var(--text3)">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div></div>';
+  }).join('');
+}
+
+function renderList(){
+  const grouped={};
+  subs.forEach(s=>{if(!grouped[s.cat])grouped[s.cat]=[];grouped[s.cat].push(s);});
+  const order=['intrattenimento','ai','cloud','fitness','telefonia','finanza','altro'];
+  let html='';
+  order.forEach(cat=>{
+    if(!grouped[cat]||!grouped[cat].length)return;
+    html+='<div class="section-title">'+CAT_LABELS[cat]+'</div>';
+    grouped[cat].forEach(s=>{
+      const c=ICON_COLORS[s.colorIdx||0];
+      html+='<div class="sub-card" onclick="openDetail(\''+s.id+'\')"><div class="sub-icon" style="background:'+c.bg+'"><i class="ti '+s.icon+'" style="color:'+c.fg+'"></i></div><div class="sub-info"><div class="sub-name">'+s.name+'</div><div class="sub-renewal">rinnovo '+fmtShort(s.renewal)+'</div></div><div class="sub-right"><div class="sub-cost">€'+s.cost.toFixed(2)+'</div><div class="sub-freq">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div></div>';
+    });
+  });
+  document.getElementById('cat-list').innerHTML=html||'<div class="empty"><i class="ti ti-inbox"></i><div class="empty-title">Nessun abbonamento</div><div style="font-size:13px;color:var(--text3)">Aggiungi il primo con il +</div></div>';
+}
+
+function renderCalendar(){
+  const sorted=subs.slice().sort((a,b)=>new Date(a.renewal)-new Date(b.renewal));
+  const el=document.getElementById('calendar-list');
+  if(!sorted.length){el.innerHTML='<div class="empty"><i class="ti ti-calendar"></i><div class="empty-title">Nessun rinnovo</div></div>';return;}
+  el.innerHTML=sorted.map(s=>{
+    const days=daysUntil(s.renewal);
+    const d=new Date(s.renewal);
+    return '<div class="renewal-row" onclick="openDetail(\''+s.id+'\')"><div class="renewal-date-box"><span class="renewal-day">'+d.getDate()+'</span><span class="renewal-month">'+MONTHS_SHORT[d.getMonth()].toUpperCase()+'</span></div><div class="renewal-info"><div class="renewal-name">'+s.name+'</div><div class="renewal-tag">'+badge(days,s.freq)+'</div></div><div class="renewal-right"><div class="renewal-amount">€'+s.cost.toFixed(2)+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div></div>';
+  }).join('');
+}
+
+function renderAll(){renderOverview();renderList();renderCalendar();}
+
+function openDetail(id){
+  const s=subs.find(x=>x.id===id); if(!s)return;
+  const c=ICON_COLORS[s.colorIdx||0];
+  const days=daysUntil(s.renewal);
+  const m=monthlyEq(s);
+  const ov=document.createElement('div');
+  ov.className='modal-overlay open'; ov.id='detail-ov';
+  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+  ov.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-header"><div style="display:flex;align-items:center;gap:12px"><div class="sub-icon" style="background:'+c.bg+';border-radius:12px;width:48px;height:48px;font-size:22px"><i class="ti '+s.icon+'" style="color:'+c.fg+'"></i></div><div><div class="modal-title">'+s.name+'</div><div class="modal-sub">'+(CAT_LABELS[s.cat]||s.cat)+'</div></div></div></div><div class="modal-body"><div class="modal-detail-row"><span class="modal-detail-label">Costo</span><span class="modal-detail-value" style="font-family:var(--mono);font-size:18px;font-weight:600">€'+s.cost.toFixed(2)+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Frequenza</span><span class="modal-detail-value">'+(s.freq==='monthly'?'Mensile':'Annuale')+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Equiv. mensile</span><span class="modal-detail-value">€'+m.toFixed(2)+'/mese</span></div><div class="modal-detail-row"><span class="modal-detail-label">Prossimo rinnovo</span><span class="modal-detail-value">'+fmtFull(s.renewal)+' '+badge(days,s.freq)+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Costo annuale</span><span class="modal-detail-value">€'+(m*12).toFixed(2)+'/anno</span></div><div class="modal-actions"><button class="btn" onclick="document.getElementById(\'detail-ov\').remove();openEditForm(\''+s.id+'\')"><i class="ti ti-edit"></i> Modifica</button><button class="btn btn-danger" onclick="document.getElementById(\'detail-ov\').remove();confirmDelete(\''+s.id+'\')"><i class="ti ti-trash"></i> Elimina</button></div></div></div>';
+  document.body.appendChild(ov);
+}
+
+function confirmDelete(id){
+  const s=subs.find(x=>x.id===id); if(!s)return;
+  if(confirm('Eliminare "'+s.name+'"?')){subs=subs.filter(x=>x.id!==id);saveData();renderAll();}
+}
+
+function showPage(name,tabIdx){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===tabIdx));
+  document.getElementById('nav-title').textContent={overview:'Abbonamenti',list:'Lista',calendar:'Rinnovi',add:editingId?'Modifica':'Nuovo abbonamento'}[name];
+  document.getElementById('add-btn').style.display=name==='add'?'none':'flex';
+  if(name!=='add') prevPageIdx=tabIdx;
+}
+
+function buildColorPicker(){
+  document.getElementById('color-picker').innerHTML=ICON_COLORS.map((c,i)=>'<div class="color-dot" style="background:'+c.bg+';border:2px solid '+(i===selectedColor?'var(--text)':'transparent')+'" onclick="selectColor('+i+')"><i class="ti ti-star" style="color:'+c.fg+';font-size:13px"></i></div>').join('');
+}
+function selectColor(i){selectedColor=i;buildColorPicker();}
+
+function openAddForm(){
+  editingId=null; selectedColor=0;
+  document.getElementById('f-name').value='';
+  document.getElementById('f-cost').value='';
+  document.getElementById('f-freq').value='monthly';
+  const nd=new Date(); nd.setMonth(nd.getMonth()+1);
+  document.getElementById('f-date').value=nd.toISOString().split('T')[0];
+  document.getElementById('f-cat').value='intrattenimento';
+  document.getElementById('f-icon').value='ti-device-tv';
+  document.getElementById('delete-container').style.display='none';
+  buildColorPicker(); showPage('add',-1);
+}
+function openEditForm(id){
+  const s=subs.find(x=>x.id===id); if(!s)return;
+  editingId=id; selectedColor=s.colorIdx||0;
+  document.getElementById('f-name').value=s.name;
+  document.getElementById('f-cost').value=s.cost;
+  document.getElementById('f-freq').value=s.freq;
+  document.getElementById('f-date').value=s.renewal;
+  document.getElementById('f-cat').value=s.cat;
+  document.getElementById('f-icon').value=s.icon;
+  document.getElementById('delete-container').style.display='block';
+  buildColorPicker(); showPage('add',-1);
+}
+function cancelAdd(){
+  editingId=null;
+  const pages=['overview','list','calendar'];
+  showPage(pages[prevPageIdx],prevPageIdx);
+}
+function saveSub(){
+  const name=document.getElementById('f-name').value.trim();
+  const cost=parseFloat(document.getElementById('f-cost').value);
+  const freq=document.getElementById('f-freq').value;
+  const date=document.getElementById('f-date').value;
+  const cat=document.getElementById('f-cat').value;
+  const icon=document.getElementById('f-icon').value;
+  if(!name||isNaN(cost)||cost<=0||!date){alert('Compila tutti i campi.');return;}
+  if(editingId){
+    const idx=subs.findIndex(x=>x.id===editingId);
+    if(idx>=0)subs[idx]={...subs[idx],name,cost,freq,renewal:date,cat,icon,colorIdx:selectedColor};
+  } else {
+    subs.push({id:Date.now().toString(),name,cost,freq,renewal:date,cat,icon,colorIdx:selectedColor});
+  }
+  saveData(); renderAll(); cancelAdd();
+}
+function deleteCurrentSub(){
+  if(!editingId)return;
+  const s=subs.find(x=>x.id===editingId);
+  if(s&&confirm('Eliminare "'+s.name+'"?')){subs=subs.filter(x=>x.id!==editingId);saveData();renderAll();editingId=null;cancelAdd();}
+}
+
+renderAll();
+
+// ── NOTIFICHE BROWSER ──────────────────────────────────────────
+const NOTIF_KEY = 'notif_settings_v1';
+
+function loadNotifSettings() {
+  try { const r = sessionStorage.getItem(NOTIF_KEY) || localStorage.getItem(NOTIF_KEY); if(r) return JSON.parse(r); } catch(e){}
+  return { enabled: false, daysBefore: 1, lastCheck: null };
+}
+function saveNotifSettings(s) {
+  const d = JSON.stringify(s);
+  try { sessionStorage.setItem(NOTIF_KEY, d); } catch(e){}
+  try { localStorage.setItem(NOTIF_KEY, d); } catch(e){}
+}
+
+let notifSettings = loadNotifSettings();
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    alert('Il tuo browser non supporta le notifiche push.');
+    return false;
+  }
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') {
+    alert('Le notifiche sono bloccate. Abilitale nelle impostazioni del browser o di Safari.');
+    return false;
+  }
+  const perm = await Notification.requestPermission();
+  return perm === 'granted';
+}
+
+function sendNotification(title, body) {
+  if (Notification.permission !== 'granted') return;
+  try {
+    new Notification(title, {
+      body,
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%231a1a18"/><text y="44" x="10" font-size="40">💳</text></svg>',
+      badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%231a1a18"/></svg>'
+    });
+  } catch(e) { console.log('Notifica non inviata:', e); }
+}
+
+function checkAndSendNotifications() {
+  if (!notifSettings.enabled || Notification.permission !== 'granted') return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().split('T')[0];
+  if (notifSettings.lastCheck === todayStr) return; // già controllato oggi
+
+  const days = notifSettings.daysBefore || 1;
+  const upcoming = subs.filter(s => {
+    const d = daysUntil(s.renewal);
+    return d >= 0 && d <= days;
+  });
+
+  if (upcoming.length === 1) {
+    const s = upcoming[0];
+    sendNotification('🔔 Rinnovo domani', `${s.name} si rinnova domani per €${s.cost.toFixed(2)}`);
+  } else if (upcoming.length > 1) {
+    const names = upcoming.map(s => s.name).join(', ');
+    const total = upcoming.reduce((a,s) => a + s.cost, 0);
+    sendNotification(`🔔 ${upcoming.length} rinnovi imminenti`, `${names} — totale €${total.toFixed(2)}`);
+  }
+
+  notifSettings.lastCheck = todayStr;
+  saveNotifSettings(notifSettings);
+}
+
+// Pannello impostazioni notifiche
+function openNotifPanel() {
+  const supported = 'Notification' in window;
+  const permLabel = !supported ? 'Non supportato' : Notification.permission === 'granted' ? '✅ Abilitato' : Notification.permission === 'denied' ? '❌ Bloccato' : '⏳ Non ancora richiesto';
+  const ov = document.createElement('div');
+  ov.className = 'modal-overlay open'; ov.id = 'notif-ov';
+  ov.onclick = e => { if(e.target===ov) ov.remove(); };
+  ov.innerHTML = `
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <div class="modal-title">Notifiche</div>
+        <div class="modal-sub">Ricevi un avviso prima dei rinnovi</div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-detail-row">
+          <span class="modal-detail-label">Stato permesso</span>
+          <span class="modal-detail-value">${permLabel}</span>
+        </div>
+        <div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:12px">
+          <span class="modal-detail-label">Attiva notifiche</span>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <input type="checkbox" id="notif-toggle" ${notifSettings.enabled ? 'checked' : ''} style="width:20px;height:20px;cursor:pointer">
+            <span style="font-size:14px">Ricevi notifiche 1 giorno prima del rinnovo</span>
+          </label>
+        </div>
+        <div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:8px;padding-top:8px">
+          <span class="modal-detail-label" style="font-size:11px;color:var(--text3)">Le notifiche vengono inviate all'apertura dell'app nel giorno del controllo. Su iPhone devono essere abilitati i permessi in Impostazioni → Safari → Notifiche sito web.</span>
+        </div>
+        <div class="modal-actions" style="margin-top:16px">
+          <button class="btn" onclick="document.getElementById('notif-ov').remove()">Chiudi</button>
+          <button class="btn btn-primary" onclick="saveNotifPanel()">Salva</button>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn" style="width:100%;color:var(--text2)" onclick="testNotification()"><i class="ti ti-bell"></i> Invia notifica di prova</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+async function saveNotifPanel() {
+  const toggle = document.getElementById('notif-toggle');
+  if (toggle && toggle.checked && Notification.permission !== 'granted') {
+    const granted = await requestNotifPermission();
+    if (!granted) { toggle.checked = false; return; }
+  }
+  notifSettings.enabled = toggle ? toggle.checked : false;
+  notifSettings.lastCheck = null; // reset per ricontrollare subito
+  saveNotifSettings(notifSettings);
+  document.getElementById('notif-ov')?.remove();
+  updateNotifBtn();
+  if (notifSettings.enabled) checkAndSendNotifications();
+}
+
+async function testNotification() {
+  const granted = await requestNotifPermission();
+  if (!granted) return;
+  sendNotification('🔔 Notifica di prova', 'Le notifiche per Abbonamenti funzionano correttamente!');
+}
+
+function updateNotifBtn() {
+  const btn = document.getElementById('notif-btn');
+  if (!btn) return;
+  btn.style.color = notifSettings.enabled && Notification.permission === 'granted' ? 'var(--ok)' : 'var(--text)';
+  btn.title = notifSettings.enabled ? 'Notifiche attive' : 'Attiva notifiche';
+}
+
+// Aggiunge bottone campanella nella nav
+(function addNotifButton() {
+  const nav = document.querySelector('.nav');
+  if (!nav) return;
+  const btn = document.createElement('button');
+  btn.className = 'nav-btn'; btn.id = 'notif-btn';
+  btn.setAttribute('aria-label', 'Impostazioni notifiche');
+  btn.innerHTML = '<i class="ti ti-bell"></i>';
+  btn.onclick = openNotifPanel;
+  // inserisci prima del bottone +
+  const addBtn = document.getElementById('add-btn');
+  nav.insertBefore(btn, addBtn);
+  updateNotifBtn();
+})();
+
+// Controlla notifiche all'avvio
+checkAndSendNotifications();
+</script>
+</body>
+</html>
