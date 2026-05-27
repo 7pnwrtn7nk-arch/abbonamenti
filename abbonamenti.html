@@ -8,535 +8,787 @@
 <meta name="apple-mobile-web-app-title" content="Abbonamenti">
 <meta name="theme-color" content="#f5f4f0">
 <title>Abbonamenti</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- tabler icons removed, using emoji -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg:#f5f4f0;--surface:#ffffff;--surface2:#efefeb;--text:#1a1a18;--text2:#6b6b67;--text3:#a0a09c;--accent-light:#e8e7e2;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--danger:#c94040;--danger-bg:#fdf0f0;--warn:#b06a10;--warn-bg:#fdf3e7;--ok:#2a7a4a;--ok-bg:#edf7f1;--r:14px;--r-sm:8px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--nav-h:64px;--safe-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root{--bg:#1a1a18;--surface:#242422;--surface2:#2e2e2b;--text:#f0efe9;--text2:#9a9a94;--text3:#5a5a56;--accent-light:#2e2e2b;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--danger:#e06060;--danger-bg:#2d1e1e;--warn:#d08030;--warn-bg:#2d2215;--ok:#4aaa6a;--ok-bg:#162a20}}
+:root {
+  --bg:#f5f4f0; --sur:#fff; --sur2:#efefeb; --tx:#1a1a18; --tx2:#6b6b67; --tx3:#a0a09c;
+  --bor:rgba(0,0,0,.08); --bor2:rgba(0,0,0,.14);
+  --red:#c94040; --redbg:#fdf0f0; --ora:#b06a10; --orabg:#fdf3e7;
+  --grn:#2a7a4a; --grnbg:#edf7f1; --acc:#e8e7e2;
+  --r:14px; --rsm:8px; --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+  --navh:64px; --safe:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1a1a18; --sur:#242422; --sur2:#2e2e2b; --tx:#f0efe9; --tx2:#9a9a94; --tx3:#5a5a56;
+  --bor:rgba(255,255,255,.08); --bor2:rgba(255,255,255,.14);
+  --red:#e06060; --redbg:#2d1e1e; --ora:#d08030; --orabg:#2d2215;
+  --grn:#4aaa6a; --grnbg:#162a20; --acc:#2e2e2b;
+}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100dvh;overscroll-behavior:none}
-#app{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px)}
-.nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:56px;gap:6px}
-.nav-title{font-size:17px;font-weight:600;letter-spacing:-0.02em;flex:1;text-align:center}
-.nav-btn{width:34px;height:34px;border-radius:50%;border:none;background:var(--surface2);color:var(--text);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.tab-bar{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--text3);font-family:var(--font);font-size:11px;padding-top:8px}
-.tab-btn i{font-size:22px}.tab-btn.active{color:var(--text)}
-.page{display:none;padding:16px}.page.active{display:block}
-.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
-.metric{background:var(--surface);border-radius:var(--r);padding:14px 16px;border:1px solid var(--border);cursor:default}
-.metric-label{font-size:11px;color:var(--text2);font-weight:500;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px}
-.metric-value{font-size:22px;font-weight:600;letter-spacing:-0.03em;line-height:1}
-.metric-sub{font-size:11px;color:var(--text3);margin-top:4px}
-.chart-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:16px}
-.chart-card-title{font-size:13px;font-weight:500;color:var(--text2);margin-bottom:14px}
-.chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
-.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
-.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin:20px 0 10px}
-.section-title:first-child{margin-top:0}
-.sub-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;position:relative}
-.sub-card:active{background:var(--surface2)}
-.sub-card.paused{opacity:0.5}
-.sub-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.sub-info{flex:1;min-width:0}
-.sub-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sub-renewal{font-size:12px;color:var(--text3);margin-top:2px}
-.sub-right{text-align:right;flex-shrink:0}
-.sub-cost{font-size:15px;font-weight:600;font-family:var(--mono);letter-spacing:-0.02em}
-.sub-freq{font-size:11px;color:var(--text3);margin-top:2px}
-.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;letter-spacing:0.02em}
-.badge-urgent{background:var(--danger-bg);color:var(--danger)}
-.badge-soon{background:var(--warn-bg);color:var(--warn)}
-.badge-ok{background:var(--ok-bg);color:var(--ok)}
-.badge-annual{background:var(--accent-light);color:var(--text2)}
-.badge-paused{background:var(--surface2);color:var(--text3)}
-.renewal-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer}
-.renewal-row:last-child{border-bottom:none}
-.renewal-date-box{width:42px;height:42px;border-radius:10px;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
-.renewal-day{font-size:16px;font-weight:600;line-height:1;font-family:var(--mono)}
-.renewal-month{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-top:1px}
-.renewal-info{flex:1;min-width:0}
-.renewal-name{font-size:14px;font-weight:500}
-.renewal-tag{font-size:11px;color:var(--text3);margin-top:4px}
-.renewal-right{text-align:right;flex-shrink:0}
-.renewal-amount{font-size:14px;font-weight:600;font-family:var(--mono)}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:flex-end;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:90dvh;overflow-y:auto;padding:0 0 calc(20px + var(--safe-bottom))}
-.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 16px}
-.modal-header{padding:0 20px 16px;border-bottom:1px solid var(--border)}
-.modal-title{font-size:18px;font-weight:600;letter-spacing:-0.02em}
-.modal-sub{font-size:13px;color:var(--text2);margin-top:3px}
-.modal-body{padding:20px}
-.modal-detail-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
-.modal-detail-row:last-child{border-bottom:none}
-.modal-detail-label{font-size:13px;color:var(--text2)}
-.modal-detail-value{font-size:13px;font-weight:500;text-align:right;max-width:60%}
-.modal-actions{display:flex;gap:10px;margin-top:20px}
-.btn{flex:1;height:48px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text)}
-.btn-danger{background:var(--danger-bg);color:var(--danger);border-color:transparent}
-.btn-warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}
-.btn-ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
-.form-group{margin-bottom:16px}
-.form-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text2);margin-bottom:6px;display:block}
-.form-input{width:100%;height:46px;padding:0 14px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:15px;outline:none}
-.form-input:focus{border-color:var(--text)}
-.form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-select.form-input{appearance:none;-webkit-appearance:none}
-.color-picker-row{display:flex;gap:8px;flex-wrap:wrap}
-.color-dot{width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
-.empty{text-align:center;padding:48px 24px;color:var(--text3)}
+body{font-family:var(--font);background:var(--bg);color:var(--tx);min-height:100dvh;overscroll-behavior:none}
+#app{padding-bottom:calc(var(--navh) + var(--safe) + 16px)}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--bor);
+  display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:56px;gap:8px}
+.nav-title{font-size:17px;font-weight:600;letter-spacing:-.02em;flex:1;text-align:center}
+.nav-btn{width:34px;height:34px;border-radius:50%;border:none;background:var(--sur2);color:var(--tx);
+  font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+
+/* TAB BAR */
+.tabbar{position:fixed;bottom:0;left:0;right:0;height:calc(var(--navh) + var(--safe));
+  padding-bottom:var(--safe);background:var(--sur);border-top:1px solid var(--bor);display:flex;z-index:100}
+.tabbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;background:none;border:none;cursor:pointer;color:var(--tx3);font-family:var(--font);font-size:11px;padding-top:8px}
+.tabbtn i{font-size:22px}
+.tabbtn.on{color:var(--tx)}
+
+/* PAGES */
+.page{display:none;padding:16px}
+.page.on{display:block}
+
+/* METRICS */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric{background:var(--sur);border-radius:var(--r);padding:14px 16px;border:1px solid var(--bor)}
+.mlabel{font-size:11px;color:var(--tx2);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.mval{font-size:22px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.msub{font-size:11px;color:var(--tx3);margin-top:4px}
+
+/* CARDS */
+.card{background:var(--sur);border-radius:var(--r);border:1px solid var(--bor);padding:16px;margin-bottom:16px}
+.ctitle{font-size:13px;font-weight:500;color:var(--tx2);margin-bottom:12px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ldot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.litem{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2)}
+
+/* SECTION TITLE */
+.stitle{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);margin:20px 0 10px}
+.stitle:first-child{margin-top:0}
+
+/* SUB CARD */
+.subcard{background:var(--sur);border-radius:var(--r);border:1px solid var(--bor);
+  display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.subcard:active{background:var(--sur2)}
+.subcard.paused{opacity:.45}
+.sicon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sinfo{flex:1;min-width:0}
+.sname{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ssub{font-size:12px;color:var(--tx3);margin-top:2px}
+.sright{text-align:right;flex-shrink:0}
+.scost{font-size:15px;font-weight:600;font-family:var(--mono)}
+.sfreq{font-size:11px;color:var(--tx3);margin-top:2px}
+
+/* BADGE */
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
+.bred{background:var(--redbg);color:var(--red)}
+.bora{background:var(--orabg);color:var(--ora)}
+.bgrn{background:var(--grnbg);color:var(--grn)}
+.bgry{background:var(--acc);color:var(--tx2)}
+
+/* RENEWAL ROW */
+.rrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bor);cursor:pointer}
+.rrow:last-child{border-bottom:none}
+.rdbox{width:42px;height:42px;border-radius:10px;background:var(--sur2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.rday{font-size:16px;font-weight:600;line-height:1;font-family:var(--mono)}
+.rmon{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);margin-top:1px}
+.rinfo{flex:1;min-width:0}
+.rname{font-size:14px;font-weight:500}
+.rtag{margin-top:4px}
+.ramount{font-size:14px;font-weight:600;font-family:var(--mono);text-align:right}
+.rfreq{font-size:11px;color:var(--tx3);text-align:right;margin-top:2px}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end}
+.overlay.on{display:flex}
+.modal{background:var(--sur);border-radius:20px 20px 0 0;width:100%;max-height:90dvh;overflow-y:auto;
+  padding:0 0 calc(24px + var(--safe))}
+.mhandle{width:36px;height:4px;background:var(--bor2);border-radius:2px;margin:12px auto 16px}
+.mhead{padding:0 20px 16px;border-bottom:1px solid var(--bor)}
+.mtitle{font-size:18px;font-weight:600;letter-spacing:-.02em}
+.msub2{font-size:13px;color:var(--tx2);margin-top:3px}
+.mbody{padding:20px}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bor)}
+.drow:last-child{border-bottom:none}
+.dlabel{font-size:13px;color:var(--tx2)}
+.dval{font-size:13px;font-weight:500;text-align:right}
+.mactions{display:flex;gap:10px;margin-top:20px}
+
+/* BUTTONS */
+.btn{flex:1;height:48px;border-radius:var(--rsm);border:1px solid var(--bor2);background:var(--sur2);
+  color:var(--tx);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;width:100%}
+.bpri{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.bred2{background:var(--redbg);color:var(--red);border-color:transparent}
+.bora2{background:var(--orabg);color:var(--ora);border-color:transparent}
+.bgrn2{background:var(--grnbg);color:var(--grn);border-color:transparent}
+
+/* FORM */
+.fgroup{margin-bottom:16px}
+.flabel{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--tx2);margin-bottom:6px;display:block}
+.finput{width:100%;height:46px;padding:0 14px;border:1px solid var(--bor2);border-radius:var(--rsm);
+  background:var(--sur2);color:var(--tx);font-family:var(--font);font-size:15px;outline:none}
+.finput:focus{border-color:var(--tx)}
+select.finput{appearance:none;-webkit-appearance:none}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cpick{display:flex;gap:8px;flex-wrap:wrap}
+.cdot{width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+/* FILTER */
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid var(--bor2);
+  background:var(--sur);font-size:12px;font-weight:500;cursor:pointer;color:var(--tx2)}
+.chip.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.sortrow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.slabel{font-size:12px;color:var(--tx3);flex-shrink:0}
+
+/* CALENDAR */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.calmonth{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.caldow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;text-align:center}
+.caldow span{font-size:11px;font-weight:600;color:var(--tx3)}
+.caldow span:last-child{color:var(--red)}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:20px}
+.calday{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:46px;border-radius:10px;cursor:default;padding:4px 2px}
+.calday.has{cursor:pointer}
+.calday.has:active{background:var(--sur2)}
+.calday.today{background:var(--sur2)}
+.calday.sel{background:var(--tx)}
+.caldaynum{font-size:15px;line-height:1.2}
+.calday.sel .caldaynum{color:var(--bg)}
+.calday.sun .caldaynum{color:var(--red)}
+.calday.sel .caldaynum{color:var(--bg) !important}
+.caldots{display:flex;gap:2px;margin-top:2px}
+.caldot{width:5px;height:5px;border-radius:50%}
+.calday.sel .caldot{background:var(--bg) !important}
+.caldetail{background:var(--sur);border-radius:var(--r);border:1px solid var(--bor);overflow:hidden;margin-bottom:16px}
+.caldetail-hd{padding:12px 16px;border-bottom:1px solid var(--bor);font-size:13px;font-weight:600;color:var(--tx2)}
+
+/* HISTORY */
+.innertabs{display:flex;border-bottom:1px solid var(--bor);margin-bottom:16px}
+.itab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:500;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent}
+.itab.on{color:var(--tx);border-bottom-color:var(--tx)}
+.hrow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bor)}
+.hrow:last-child{border-bottom:none}
+.hname{font-size:13px;font-weight:500}
+.hdate{font-size:11px;color:var(--tx3);margin-top:2px}
+.hamount{font-size:13px;font-weight:600;font-family:var(--mono);color:var(--red)}
+
+/* BANNERS */
+.banner{border-radius:var(--rsm);padding:12px 14px;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px}
+.bannericon{font-size:18px;flex-shrink:0;margin-top:1px}
+.bannertext{font-size:13px;line-height:1.5;flex:1}
+
+/* BUDGET BAR */
+.budgetbar{height:8px;border-radius:4px;background:var(--sur2);margin-top:6px;overflow:hidden}
+.budgetfill{height:100%;border-radius:4px;transition:width .4s}
+
+/* TOGGLE */
+.toggle{position:relative;width:44px;height:26px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.tslider{position:absolute;inset:0;background:var(--bor2);border-radius:13px;cursor:pointer;transition:.2s}
+.tslider:before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked + .tslider{background:var(--grn)}
+.toggle input:checked + .tslider:before{transform:translateX(18px)}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 24px;color:var(--tx3)}
 .empty i{font-size:48px;display:block;margin-bottom:12px}
-.empty-title{font-size:16px;font-weight:500;color:var(--text2);margin-bottom:6px}
-.notif-banner{background:var(--warn-bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
-.notif-banner i{color:var(--warn);font-size:18px;flex-shrink:0;margin-top:1px}
-.notif-text{font-size:13px;color:var(--text);line-height:1.5}
-.budget-bar-wrap{background:var(--surface2);border-radius:4px;height:8px;margin-top:8px;overflow:hidden}
-.budget-bar{height:100%;border-radius:4px;transition:width 0.4s}
-.filter-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-.filter-row::-webkit-scrollbar{display:none}
-.filter-chip{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer;color:var(--text2)}
-.filter-chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-.sort-row{display:flex;gap:8px;margin-bottom:14px;align-items:center}
-.sort-label{font-size:12px;color:var(--text3);flex-shrink:0}
-.history-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
-.history-row:last-child{border-bottom:none}
-.history-name{font-size:13px;font-weight:500}
-.history-date{font-size:11px;color:var(--text3);margin-top:2px}
-.history-amount{font-size:13px;font-weight:600;font-family:var(--mono);color:var(--danger)}
-.toggle-switch{position:relative;width:44px;height:26px;flex-shrink:0}
-.toggle-switch input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:13px;cursor:pointer;transition:0.2s}
-.toggle-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:white;border-radius:50%;transition:0.2s}
-.toggle-switch input:checked + .toggle-slider{background:var(--ok)}
-.toggle-switch input:checked + .toggle-slider:before{transform:translateX(18px)}
-.tab-inner{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
-.tab-inner-btn{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent}
-.tab-inner-btn.active{color:var(--text);border-bottom-color:var(--text)}
-.duplicate-warn{background:var(--warn-bg);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--warn);display:flex;gap:8px;align-items:flex-start}
+.empty-t{font-size:16px;font-weight:500;color:var(--tx2);margin-bottom:6px}
+.empty-s{font-size:13px}
 </style>
+
 </head>
 <body>
 <div id="app">
+
+  <!-- NAV -->
   <nav class="nav">
     <div style="display:flex;gap:6px">
-      <button class="nav-btn" id="notif-btn" onclick="openNotifPanel()" aria-label="Notifiche"><i class="ti ti-bell"></i></button>
-      <button class="nav-btn" onclick="openExportPanel()" aria-label="Esporta"><i class="ti ti-download"></i></button>
+      <button class="nav-btn" id="notifbtn" onclick="openSettings()" title="Impostazioni"><span style="font-size:inherit;">⚙</span></button>
+      <button class="nav-btn" onclick="openExport()" title="Esporta"><span style="font-size:inherit;">↓</span></button>
     </div>
-    <span class="nav-title" id="nav-title">Abbonamenti</span>
-    <button class="nav-btn" id="add-btn" onclick="openAddForm()" aria-label="Aggiungi"><i class="ti ti-plus"></i></button>
+    <span class="nav-title" id="navtitle">Abbonamenti</span>
+    <button class="nav-btn" id="addbtn" onclick="openAdd()" title="Aggiungi"><span style="font-size:inherit;">+</span></button>
   </nav>
 
-  <!-- OVERVIEW -->
-  <div class="page active" id="page-overview">
-    <div id="notif-container"></div>
-    <div id="budget-container"></div>
-    <div id="duplicate-container"></div>
-    <div class="metric-grid">
-      <div class="metric"><div class="metric-label">Mensile</div><div class="metric-value" id="m-monthly">—</div><div class="metric-sub">abbonamenti attivi</div></div>
-      <div class="metric"><div class="metric-label">Annuale</div><div class="metric-value" id="m-annual">—</div><div class="metric-sub">proiezione</div></div>
-      <div class="metric"><div class="metric-label">Attivi</div><div class="metric-value" id="m-count">—</div><div class="metric-sub" id="m-paused-sub"></div></div>
-      <div class="metric"><div class="metric-label">Più costoso</div><div class="metric-value" id="m-top" style="font-size:15px;padding-top:4px">—</div><div class="metric-sub" id="m-top-cost"></div></div>
+  <!-- PAGE: OVERVIEW -->
+  <div class="page on" id="pg-overview">
+    <div id="alertbox"></div>
+    <div class="mgrid">
+      <div class="metric"><div class="mlabel">Mensile</div><div class="mval" id="mv-monthly">—</div><div class="msub">spesa attiva</div></div>
+      <div class="metric"><div class="mlabel">Annuale</div><div class="mval" id="mv-annual">—</div><div class="msub">proiezione</div></div>
+      <div class="metric"><div class="mlabel">Attivi</div><div class="mval" id="mv-count">—</div><div class="msub" id="mv-paused"></div></div>
+      <div class="metric"><div class="mlabel">Più costoso</div><div class="mval" id="mv-top" style="font-size:15px;padding-top:4px">—</div><div class="msub" id="mv-topcost"></div></div>
     </div>
-    <div class="chart-card">
-      <div class="chart-card-title">Per categoria</div>
-      <div style="position:relative;height:200px"><canvas id="pieChart" role="img" aria-label="Ripartizione spese per categoria"></canvas></div>
-      <div class="chart-legend" id="chart-legend"></div>
+    <div class="card">
+      <div class="ctitle">Per categoria</div>
+      <div style="position:relative;height:200px"><canvas id="piechart"></canvas></div>
+      <div class="legend" id="pielegend"></div>
     </div>
-    <div class="section-title">Prossimi rinnovi</div>
-    <div id="upcoming-list"></div>
+    <div class="stitle">Prossimi rinnovi</div>
+    <div id="upcoming"></div>
   </div>
 
-  <!-- LIST -->
-  <div class="page" id="page-list">
-    <div class="filter-row" id="filter-row">
-      <div class="filter-chip active" onclick="setFilter('tutti',this)">Tutti</div>
-      <div class="filter-chip" onclick="setFilter('intrattenimento',this)">Intrattenimento</div>
-      <div class="filter-chip" onclick="setFilter('ai',this)">AI & Prod.</div>
-      <div class="filter-chip" onclick="setFilter('cloud',this)">Cloud</div>
-      <div class="filter-chip" onclick="setFilter('fitness',this)">Fitness</div>
-      <div class="filter-chip" onclick="setFilter('telefonia',this)">Telefonia</div>
-      <div class="filter-chip" onclick="setFilter('finanza',this)">Finanza</div>
-      <div class="filter-chip" onclick="setFilter('paused',this)">In pausa</div>
-    </div>
-    <div class="sort-row">
-      <span class="sort-label">Ordina:</span>
-      <select class="form-input" id="sort-select" style="height:34px;font-size:12px;padding:0 10px" onchange="renderList()">
+  <!-- PAGE: LIST -->
+  <div class="page" id="pg-list">
+    <div class="filters" id="filterrow"></div>
+    <div class="sortrow">
+      <span class="slabel">Ordina:</span>
+      <select class="finput" id="sortsel" style="height:34px;font-size:12px;padding:0 10px" onchange="drawList()">
         <option value="cat">Categoria</option>
-        <option value="cost-desc">Costo ↓</option>
-        <option value="cost-asc">Costo ↑</option>
+        <option value="cost">Costo ↓</option>
         <option value="date">Prossimo rinnovo</option>
-        <option value="name">Nome A-Z</option>
+        <option value="name">Nome A–Z</option>
       </select>
     </div>
-    <div id="cat-list"></div>
+    <div id="listcont"></div>
   </div>
 
-  <!-- CALENDAR -->
-  <div class="page" id="page-calendar">
-    <div style="background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:4px 16px">
-      <div id="calendar-list"></div>
+  <!-- PAGE: CALENDAR -->
+  <div class="page" id="pg-calendar">
+    <div class="calhead">
+      <button class="nav-btn" onclick="calMove(-1)"><span style="font-size:inherit;">‹</span></button>
+      <span class="calmonth" id="calmonth"></span>
+      <button class="nav-btn" onclick="calMove(1)"><span style="font-size:inherit;">›</span></button>
     </div>
+    <div class="caldow">
+      <span>L</span><span>M</span><span>M</span><span>G</span><span>V</span><span>S</span><span>D</span>
+    </div>
+    <div class="calgrid" id="calgrid"></div>
+    <div id="caldetail"></div>
   </div>
 
-  <!-- STORICO -->
-  <div class="page" id="page-history">
-    <div class="tab-inner" id="history-tabs">
-      <div class="tab-inner-btn active" onclick="setHistoryTab('log',this)">Pagamenti</div>
-      <div class="tab-inner-btn" onclick="setHistoryTab('chart',this)">Grafico mensile</div>
+  <!-- PAGE: HISTORY -->
+  <div class="page" id="pg-history">
+    <div class="innertabs">
+      <div class="itab on" id="itab-log" onclick="switchHistTab('log')">Pagamenti</div>
+      <div class="itab" id="itab-chart" onclick="switchHistTab('chart')">Grafico mensile</div>
     </div>
-    <div id="history-log"></div>
-    <div id="history-chart-wrap" style="display:none">
-      <div class="chart-card" style="margin-bottom:0">
-        <div class="chart-card-title">Spesa mensile (ultimi 12 mesi)</div>
-        <div style="position:relative;height:220px"><canvas id="barChart" role="img" aria-label="Grafico spesa mensile"></canvas></div>
+    <div id="histlog"></div>
+    <div id="histchart" style="display:none">
+      <div class="card" style="margin-bottom:0">
+        <div class="ctitle">Spesa mensile — ultimi 12 mesi</div>
+        <div style="position:relative;height:220px"><canvas id="barchart"></canvas></div>
       </div>
     </div>
   </div>
 
-  <!-- ADD/EDIT -->
-  <div class="page" id="page-add">
-    <div class="form-group"><label class="form-label">Nome servizio</label><input class="form-input" type="text" id="f-name" placeholder="es. Netflix"></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Costo (€)</label><input class="form-input" type="number" id="f-cost" placeholder="9.99" step="0.01" min="0"></div>
-      <div class="form-group"><label class="form-label">Frequenza</label><select class="form-input" id="f-freq"><option value="monthly">Mensile</option><option value="annual">Annuale</option></select></div>
+  <!-- PAGE: ADD/EDIT -->
+  <div class="page" id="pg-add">
+    <div class="fgroup"><label class="flabel">Nome servizio</label><input class="finput" id="f-name" type="text" placeholder="es. Netflix"></div>
+    <div class="frow">
+      <div class="fgroup"><label class="flabel">Costo (€)</label><input class="finput" id="f-cost" type="number" placeholder="9.99" step="0.01" min="0"></div>
+      <div class="fgroup"><label class="flabel">Frequenza</label>
+        <select class="finput" id="f-freq"><option value="monthly">Mensile</option><option value="annual">Annuale</option></select>
+      </div>
     </div>
-    <div class="form-group"><label class="form-label">Prossimo rinnovo</label><input class="form-input" type="date" id="f-date"></div>
-    <div class="form-group"><label class="form-label">Categoria</label><select class="form-input" id="f-cat"><option value="intrattenimento">Intrattenimento</option><option value="ai">AI & Produttività</option><option value="cloud">Cloud & Utility</option><option value="fitness">Fitness & Salute</option><option value="telefonia">Telefonia</option><option value="finanza">Finanza</option><option value="altro">Altro</option></select></div>
-    <div class="form-group">
-      <label class="form-label">Notifica anticipata</label>
-      <select class="form-input" id="f-notif-days">
-        <option value="1">1 giorno prima</option>
-        <option value="3">3 giorni prima</option>
-        <option value="7">7 giorni prima</option>
-        <option value="0">Nessuna</option>
+    <div class="fgroup"><label class="flabel">Prossimo rinnovo</label><input class="finput" id="f-date" type="date"></div>
+    <div class="fgroup"><label class="flabel">Categoria</label>
+      <select class="finput" id="f-cat">
+        <option value="int">Intrattenimento</option><option value="ai">AI & Produttività</option>
+        <option value="cloud">Cloud & Utility</option><option value="fit">Fitness & Salute</option>
+        <option value="tel">Telefonia</option><option value="fin">Finanza</option><option value="alt">Altro</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">Colore icona</label><div class="color-picker-row" id="color-picker"></div></div>
-    <div class="form-group"><label class="form-label">Icona</label><select class="form-input" id="f-icon"><option value="ti-device-tv">TV / Streaming</option><option value="ti-music">Musica</option><option value="ti-ball-football">Sport</option><option value="ti-brain">AI / Assistente</option><option value="ti-robot">Chatbot</option><option value="ti-microphone">Trascrizione</option><option value="ti-pencil">Design / Grafica</option><option value="ti-cloud">Cloud Storage</option><option value="ti-brand-apple">Apple</option><option value="ti-brand-google">Google</option><option value="ti-camera">Sicurezza</option><option value="ti-apple">Salute / Cibo</option><option value="ti-moon">Meditazione</option><option value="ti-phone">Telefonia</option><option value="ti-credit-card">Finanza / Banca</option><option value="ti-shopping-bag">Shopping</option><option value="ti-star">Altro</option></select></div>
+    <div class="fgroup"><label class="flabel">Notifica anticipata</label>
+      <select class="finput" id="f-notif"><option value="1">1 giorno prima</option><option value="3">3 giorni prima</option><option value="7">7 giorni prima</option><option value="0">Nessuna</option></select>
+    </div>
+    <div class="fgroup"><label class="flabel">Colore</label><div class="cpick" id="cpick"></div></div>
+    <div class="fgroup"><label class="flabel">Icona</label>
+      <select class="finput" id="f-icon">
+        <option value="ti-device-tv">TV / Streaming</option><option value="ti-music">Musica</option>
+        <option value="ti-ball-football">Sport</option><option value="ti-brain">AI / Assistente</option>
+        <option value="ti-robot">Chatbot</option><option value="ti-microphone">Trascrizione</option>
+        <option value="ti-pencil">Design / Grafica</option><option value="ti-cloud">Cloud Storage</option>
+        <option value="ti-brand-apple">Apple</option><option value="ti-brand-google">Google</option>
+        <option value="ti-camera">Sicurezza</option><option value="ti-apple">Salute / Cibo</option>
+        <option value="ti-moon">Meditazione</option><option value="ti-phone">Telefonia</option>
+        <option value="ti-credit-card">Finanza / Banca</option><option value="ti-shopping-bag">Shopping</option>
+        <option value="ti-star">Altro</option>
+      </select>
+    </div>
     <div style="display:flex;gap:10px;margin-top:8px">
       <button class="btn" onclick="cancelAdd()">Annulla</button>
-      <button class="btn btn-primary" onclick="saveSub()">Salva</button>
+      <button class="btn bpri" onclick="saveSub()">Salva</button>
     </div>
-    <div id="delete-container" style="margin-top:12px;display:none;gap:10px;flex-direction:column">
-      <button class="btn btn-warn" style="width:100%" id="pause-btn" onclick="togglePause()"><i class="ti ti-player-pause"></i> <span id="pause-label">Metti in pausa</span></button>
-      <button class="btn btn-danger" style="width:100%" onclick="deleteCurrentSub()"><i class="ti ti-trash"></i> Elimina abbonamento</button>
+    <div id="editbtns" style="margin-top:12px;display:none;flex-direction:column;gap:10px">
+      <button class="btn bora2" id="pausebtn" onclick="togglePause()" style="width:100%"><span style="font-size:inherit;">⏸</span> <span id="pauselbl">Metti in pausa</span></button>
+      <button class="btn bred2" onclick="deleteSub()" style="width:100%"><span style="font-size:inherit;">🗑</span> Elimina abbonamento</button>
     </div>
   </div>
-</div>
 
-<nav class="tab-bar">
-  <button class="tab-btn active" onclick="showPage('overview',0)" aria-label="Riepilogo"><i class="ti ti-chart-pie"></i><span>Riepilogo</span></button>
-  <button class="tab-btn" onclick="showPage('list',1)" aria-label="Lista"><i class="ti ti-list"></i><span>Lista</span></button>
-  <button class="tab-btn" onclick="showPage('calendar',2)" aria-label="Rinnovi"><i class="ti ti-calendar-event"></i><span>Rinnovi</span></button>
-  <button class="tab-btn" onclick="showPage('history',3)" aria-label="Storico"><i class="ti ti-history"></i><span>Storico</span></button>
+</div><!-- /app -->
+
+<!-- TAB BAR -->
+<nav class="tabbar">
+  <button class="tabbtn on" onclick="showPage('overview',0)" aria-label="Riepilogo"><span style="font-size:inherit;">◑</span><span>Riepilogo</span></button>
+  <button class="tabbtn" onclick="showPage('list',1)" aria-label="Lista"><span style="font-size:inherit;">≡</span><span>Lista</span></button>
+  <button class="tabbtn" onclick="showPage('calendar',2)" aria-label="Rinnovi"><span style="font-size:inherit;">📅</span><span>Rinnovi</span></button>
+  <button class="tabbtn" onclick="showPage('history',3)" aria-label="Storico"><span style="font-size:inherit;">↺</span><span>Storico</span></button>
 </nav>
 
 <script>
-const CAT_COLORS={intrattenimento:'#D85A30',ai:'#7F77DD',cloud:'#378ADD',fitness:'#1D9E75',telefonia:'#BA7517',finanza:'#888780',altro:'#5DCAA5'};
-const CAT_LABELS={intrattenimento:'Intrattenimento',ai:'AI & Produttività',cloud:'Cloud & Utility',fitness:'Fitness & Salute',telefonia:'Telefonia',finanza:'Finanza',altro:'Altro'};
-const ICON_COLORS=[{bg:'#FAECE7',fg:'#D85A30'},{bg:'#EEEDFE',fg:'#534AB7'},{bg:'#E6F1FB',fg:'#185FA5'},{bg:'#E1F5EE',fg:'#0F6E56'},{bg:'#FAEEDA',fg:'#854F0B'},{bg:'#F1EFE8',fg:'#5F5E5A'},{bg:'#FBEAF0',fg:'#993556'},{bg:'#EAF3DE',fg:'#3B6D11'}];
-const CAT_SIMILAR={intrattenimento:['streaming','tv','film'],ai:['ai','assistente'],cloud:['storage','cloud']};
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const CATCOL = {int:'#D85A30',ai:'#7F77DD',cloud:'#378ADD',fit:'#1D9E75',tel:'#BA7517',fin:'#888780',alt:'#5DCAA5'};
+const CATLBL = {int:'Intrattenimento',ai:'AI & Produttività',cloud:'Cloud & Utility',fit:'Fitness & Salute',tel:'Telefonia',fin:'Finanza',alt:'Altro'};
+const ICONCOL = [
+  {bg:'#FAECE7',fg:'#D85A30'},{bg:'#EEEDFE',fg:'#534AB7'},{bg:'#E6F1FB',fg:'#185FA5'},
+  {bg:'#E1F5EE',fg:'#0F6E56'},{bg:'#FAEEDA',fg:'#854F0B'},{bg:'#F1EFE8',fg:'#5F5E5A'},
+  {bg:'#FBEAF0',fg:'#993556'},{bg:'#EAF3DE',fg:'#3B6D11'}
+];
+const MSSHORT = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+const MSLONG  = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 
-const DEFAULTS=[
-  {id:'1',name:'Netflix Premium',cost:19.99,freq:'monthly',renewal:'2026-06-16',cat:'intrattenimento',icon:'ti-device-tv',colorIdx:0,notifDays:1,paused:false},
-  {id:'2',name:'Amazon Prime',cost:49.90,freq:'annual',renewal:'2026-07-07',cat:'intrattenimento',icon:'ti-shopping-bag',colorIdx:0,notifDays:1,paused:false},
-  {id:'3',name:'DAZN Full',cost:52.49,freq:'monthly',renewal:'2026-06-25',cat:'intrattenimento',icon:'ti-ball-football',colorIdx:0,notifDays:1,paused:false},
-  {id:'4',name:'Wind (personale)',cost:15.98,freq:'monthly',renewal:'2026-06-05',cat:'telefonia',icon:'ti-phone',colorIdx:4,notifDays:1,paused:false},
-  {id:'5',name:'Yazio Pro',cost:29.90,freq:'annual',renewal:'2026-05-22',cat:'fitness',icon:'ti-apple',colorIdx:3,notifDays:1,paused:false},
-  {id:'6',name:'Apple One Famiglia',cost:25.95,freq:'monthly',renewal:'2026-05-30',cat:'cloud',icon:'ti-brand-apple',colorIdx:2,notifDays:1,paused:false},
-  {id:'7',name:'Balance Meditation',cost:44.99,freq:'annual',renewal:'2026-07-27',cat:'fitness',icon:'ti-moon',colorIdx:3,notifDays:1,paused:false},
-  {id:'8',name:'ChatGPT Plus',cost:22.99,freq:'monthly',renewal:'2026-05-22',cat:'ai',icon:'ti-robot',colorIdx:1,notifDays:1,paused:false},
-  {id:'9',name:'Claude Pro',cost:22.00,freq:'monthly',renewal:'2026-05-23',cat:'ai',icon:'ti-brain',colorIdx:1,notifDays:1,paused:false},
-  {id:'10',name:'Disney+ Premium',cost:15.99,freq:'monthly',renewal:'2026-06-02',cat:'intrattenimento',icon:'ti-device-tv',colorIdx:0,notifDays:1,paused:false},
-  {id:'11',name:'eufy Cloud',cost:3.99,freq:'monthly',renewal:'2026-06-15',cat:'cloud',icon:'ti-camera',colorIdx:2,notifDays:1,paused:false},
-  {id:'12',name:'iCloud+ 2TB',cost:9.99,freq:'monthly',renewal:'2026-06-01',cat:'cloud',icon:'ti-cloud',colorIdx:2,notifDays:1,paused:false},
-  {id:'13',name:'Morpholio Trace',cost:19.99,freq:'annual',renewal:'2027-01-19',cat:'ai',icon:'ti-pencil',colorIdx:1,notifDays:1,paused:false},
-  {id:'14',name:'Otter Premium',cost:99.99,freq:'annual',renewal:'2027-03-27',cat:'ai',icon:'ti-microphone',colorIdx:1,notifDays:1,paused:false},
-  {id:'15',name:'Google One',cost:19.99,freq:'annual',renewal:'2026-09-10',cat:'cloud',icon:'ti-brand-google',colorIdx:2,notifDays:1,paused:false},
-  {id:'16',name:'Paramount+',cost:7.99,freq:'monthly',renewal:'2026-06-13',cat:'intrattenimento',icon:'ti-device-tv',colorIdx:0,notifDays:1,paused:false},
-  {id:'17',name:'Revolut Metal',cost:15.99,freq:'monthly',renewal:'2026-05-28',cat:'finanza',icon:'ti-credit-card',colorIdx:5,notifDays:1,paused:false}
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const DEFAULTS = [
+  {id:'1', name:'Netflix Premium',    cost:19.99, freq:'monthly', renewal:'2026-06-16', cat:'int',   icon:'ti-device-tv',     ci:0, nd:1, paused:false},
+  {id:'2', name:'Amazon Prime',       cost:49.90, freq:'annual',  renewal:'2026-07-07', cat:'int',   icon:'ti-shopping-bag',  ci:0, nd:1, paused:false},
+  {id:'3', name:'DAZN Full',          cost:52.49, freq:'monthly', renewal:'2026-06-25', cat:'int',   icon:'ti-ball-football', ci:0, nd:1, paused:false},
+  {id:'4', name:'Wind (personale)',   cost:15.98, freq:'monthly', renewal:'2026-06-05', cat:'tel',   icon:'ti-phone',         ci:4, nd:1, paused:false},
+  {id:'5', name:'Yazio Pro',          cost:29.90, freq:'annual',  renewal:'2026-05-22', cat:'fit',   icon:'ti-apple',         ci:3, nd:1, paused:false},
+  {id:'6', name:'Apple One Famiglia', cost:25.95, freq:'monthly', renewal:'2026-05-30', cat:'cloud', icon:'ti-brand-apple',   ci:2, nd:1, paused:false},
+  {id:'7', name:'Balance Meditation', cost:44.99, freq:'annual',  renewal:'2026-07-27', cat:'fit',   icon:'ti-moon',          ci:3, nd:1, paused:false},
+  {id:'8', name:'ChatGPT Plus',       cost:22.99, freq:'monthly', renewal:'2026-05-22', cat:'ai',    icon:'ti-robot',         ci:1, nd:1, paused:false},
+  {id:'9', name:'Claude Pro',         cost:22.00, freq:'monthly', renewal:'2026-05-23', cat:'ai',    icon:'ti-brain',         ci:1, nd:1, paused:false},
+  {id:'10',name:'Disney+ Premium',    cost:15.99, freq:'monthly', renewal:'2026-06-02', cat:'int',   icon:'ti-device-tv',     ci:0, nd:1, paused:false},
+  {id:'11',name:'eufy Cloud',         cost:3.99,  freq:'monthly', renewal:'2026-06-15', cat:'cloud', icon:'ti-camera',        ci:2, nd:1, paused:false},
+  {id:'12',name:'iCloud+ 2TB',        cost:9.99,  freq:'monthly', renewal:'2026-06-01', cat:'cloud', icon:'ti-cloud',         ci:2, nd:1, paused:false},
+  {id:'13',name:'Morpholio Trace',    cost:19.99, freq:'annual',  renewal:'2027-01-19', cat:'ai',    icon:'ti-pencil',        ci:1, nd:1, paused:false},
+  {id:'14',name:'Otter Premium',      cost:99.99, freq:'annual',  renewal:'2027-03-27', cat:'ai',    icon:'ti-microphone',    ci:1, nd:1, paused:false},
+  {id:'15',name:'Google One',         cost:19.99, freq:'annual',  renewal:'2026-09-10', cat:'cloud', icon:'ti-brand-google',  ci:2, nd:1, paused:false},
+  {id:'16',name:'Paramount+',         cost:7.99,  freq:'monthly', renewal:'2026-06-13', cat:'int',   icon:'ti-device-tv',     ci:0, nd:1, paused:false},
+  {id:'17',name:'Revolut Metal',      cost:15.99, freq:'monthly', renewal:'2026-05-28', cat:'fin',   icon:'ti-credit-card',   ci:5, nd:1, paused:false}
 ];
 
-const SK='abbonamenti_v4', HK='history_v1', SK2='settings_v2', BK='budget_v1';
+// Storage
 function stor(k,v){try{localStorage.setItem(k,v)}catch(e){}try{sessionStorage.setItem(k,v)}catch(e){}}
-function load(k){try{const r=localStorage.getItem(k);if(r)return r}catch(e){}try{const r=sessionStorage.getItem(k);if(r)return r}catch(e){}return null;}
+function load(k){try{const r=localStorage.getItem(k);if(r!=null)return r}catch(e){}try{const r=sessionStorage.getItem(k);if(r!=null)return r}catch(e){}return null}
 
-let subs, history, settings, budget;
+let subs, paylog, cfg;
 function loadAll(){
-  subs=JSON.parse(load(SK)||'null')||JSON.parse(JSON.stringify(DEFAULTS));
-  history=JSON.parse(load(HK)||'[]');
-  settings=JSON.parse(load(SK2)||'{"enabled":false,"lastCheck":null}');
-  budget=JSON.parse(load(BK)||'{"enabled":false,"amount":0}');
+  const sd=load('subs5'); subs = sd ? JSON.parse(sd) : JSON.parse(JSON.stringify(DEFAULTS));
+  const pd=load('paylog1'); paylog = pd ? JSON.parse(pd) : [];
+  const cd=load('cfg1'); cfg = cd ? JSON.parse(cd) : {notif:false, budget:0, budgetOn:false, lastCheck:null};
 }
-function saveAll(){stor(SK,JSON.stringify(subs));stor(HK,JSON.stringify(history));stor(SK2,JSON.stringify(settings));stor(BK,JSON.stringify(budget));}
-
+function saveAll(){
+  stor('subs5',JSON.stringify(subs));
+  stor('paylog1',JSON.stringify(paylog));
+  stor('cfg1',JSON.stringify(cfg));
+}
 loadAll();
 
-let pieChart=null,barChart=null,editingId=null,selectedColor=0,prevPageIdx=0,currentFilter='tutti',currentHistoryTab='log';
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function mthly(s){ return s.freq==='monthly' ? s.cost : s.cost/12; }
+function daysTo(ds){
+  const t=new Date(); t.setHours(0,0,0,0);
+  const d=new Date(ds); d.setHours(0,0,0,0);
+  return Math.round((d-t)/86400000);
+}
+function fmtShort(ds){ const d=new Date(ds); return d.getDate()+' '+MSSHORT[d.getMonth()]; }
+function fmtLong(ds){ const d=new Date(ds); return d.getDate()+' '+MSLONG[d.getMonth()]+' '+d.getFullYear(); }
 
-function monthlyEq(s){return s.freq==='monthly'?s.cost:s.cost/12;}
-function daysUntil(ds){const t=new Date();t.setHours(0,0,0,0);const d=new Date(ds);d.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
-const MS=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
-const MF=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
-function fmtS(ds){const d=new Date(ds);return d.getDate()+' '+MS[d.getMonth()];}
-function fmtF(ds){const d=new Date(ds);return d.getDate()+' '+MF[d.getMonth()]+' '+d.getFullYear();}
-function badge(days,freq,paused){
-  if(paused)return '<span class="badge badge-paused">in pausa</span>';
-  if(freq==='annual')return '<span class="badge badge-annual">annuale</span>';
-  if(days<0)return '<span class="badge badge-urgent">scaduto</span>';
-  if(days===0)return '<span class="badge badge-urgent">oggi</span>';
-  if(days<=7)return '<span class="badge badge-urgent">'+days+'g</span>';
-  if(days<=14)return '<span class="badge badge-soon">'+days+'g</span>';
-  return '<span class="badge badge-ok">'+days+'g</span>';
+function badge(s){
+  if(s.paused) return '<span class="badge bgry">in pausa</span>';
+  if(s.freq==='annual') return '<span class="badge bgry">annuale</span>';
+  const d=daysTo(s.renewal);
+  if(d<0)  return '<span class="badge bred">scaduto</span>';
+  if(d===0) return '<span class="badge bred">oggi</span>';
+  if(d<=7)  return '<span class="badge bred">'+d+'g</span>';
+  if(d<=14) return '<span class="badge bora">'+d+'g</span>';
+  return '<span class="badge bgrn">'+d+'g</span>';
 }
 
-// Auto-aggiorna date di rinnovo scadute
-function autoRenewDates(){
+const ICON_EMOJI={
+  'ti-device-tv':'📺','ti-music':'🎵','ti-ball-football':'⚽','ti-brain':'🧠',
+  'ti-robot':'🤖','ti-microphone':'🎙️','ti-pencil':'✏️','ti-cloud':'☁️',
+  'ti-brand-apple':'🍏','ti-brand-google':'🔵','ti-camera':'📷','ti-apple':'🍎',
+  'ti-moon':'🌙','ti-phone':'📱','ti-credit-card':'💳','ti-shopping-bag':'🛍️','ti-star':'⭐'
+};
+function iconHTML(s, size){
+  const c=ICONCOL[s.ci||0];
+  const sz=size||42;
+  const em=ICON_EMOJI[s.icon]||'📦';
+  return '<div class="sicon" style="background:'+c.bg+';width:'+sz+'px;height:'+sz+'px;border-radius:'+(sz>36?10:8)+'px;font-size:'+(sz>36?20:17)+'px">'+em+'</div>';
+}
+
+// Auto-advance expired renewals & log payment
+function autoAdvance(){
+  const today=new Date(); today.setHours(0,0,0,0);
   let changed=false;
-  const today=new Date();today.setHours(0,0,0,0);
   subs.forEach(s=>{
-    if(s.paused)return;
-    const d=new Date(s.renewal);d.setHours(0,0,0,0);
+    if(s.paused) return;
+    const d=new Date(s.renewal); d.setHours(0,0,0,0);
     if(d<today){
-      // Registra nel storico
-      history.push({id:Date.now().toString()+Math.random(),subId:s.id,name:s.name,amount:s.cost,date:s.renewal,cat:s.cat});
-      // Avanza data
-      if(s.freq==='monthly'){d.setMonth(d.getMonth()+1);}
-      else{d.setFullYear(d.getFullYear()+1);}
+      paylog.push({id:Date.now()+''+Math.random(), subId:s.id, name:s.name, amount:s.cost, date:s.renewal, cat:s.cat});
+      if(s.freq==='monthly') d.setMonth(d.getMonth()+1);
+      else d.setFullYear(d.getFullYear()+1);
       s.renewal=d.toISOString().split('T')[0];
       changed=true;
     }
   });
-  if(changed)saveAll();
+  if(changed) saveAll();
 }
-autoRenewDates();
+autoAdvance();
 
-// Rileva duplicati (stessa categoria con costi simili)
-function findDuplicates(){
-  const dups=[];
+// Detect possible duplicates (same category, similar cost)
+function findDups(){
   const active=subs.filter(s=>!s.paused);
+  const pairs=[];
   for(let i=0;i<active.length;i++){
     for(let j=i+1;j<active.length;j++){
-      const a=active[i],b=active[j];
-      if(a.cat===b.cat){
-        const diff=Math.abs(monthlyEq(a)-monthlyEq(b));
-        const avg=(monthlyEq(a)+monthlyEq(b))/2;
-        if(diff/avg<0.5&&avg>2){dups.push([a.name,b.name]);}
-      }
+      const a=active[i], b=active[j];
+      if(a.cat!==b.cat) continue;
+      const diff=Math.abs(mthly(a)-mthly(b));
+      const avg=(mthly(a)+mthly(b))/2;
+      if(avg>1 && diff/avg<0.5) pairs.push([a.name, b.name]);
     }
   }
-  return dups;
+  return pairs;
 }
 
-function renderOverview(){
+// ─── PAGE NAVIGATION ─────────────────────────────────────────────────────────
+let curPage='overview', prevPageIdx=0, editingId=null;
+
+function showPage(name, idx){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tabbtn').forEach((b,i)=>b.classList.toggle('on',i===idx));
+  document.getElementById('pg-'+name).classList.add('on');
+  const titles={overview:'Abbonamenti',list:'Lista',calendar:'Rinnovi',history:'Storico',add:editingId?'Modifica':'Nuovo'};
+  document.getElementById('navtitle').textContent=titles[name]||'Abbonamenti';
+  document.getElementById('addbtn').style.display=name==='add'?'none':'flex';
+  if(name!=='add'){ curPage=name; prevPageIdx=idx; }
+  if(name==='overview') drawOverview();
+  if(name==='list')     drawList();
+  if(name==='calendar') drawCalendar();
+  if(name==='history')  drawHistory();
+}
+
+// ─── OVERVIEW ────────────────────────────────────────────────────────────────
+let pieChart=null;
+
+function drawOverview(){
   const active=subs.filter(s=>!s.paused);
   const paused=subs.filter(s=>s.paused);
-  const total=active.reduce((a,s)=>a+monthlyEq(s),0);
-  document.getElementById('m-monthly').textContent='€'+total.toFixed(2);
-  document.getElementById('m-annual').textContent='€'+Math.round(total*12).toLocaleString('it-IT');
-  document.getElementById('m-count').textContent=active.length;
-  document.getElementById('m-paused-sub').textContent=paused.length>0?paused.length+' in pausa':'abbonamenti attivi';
-  const top=active.slice().sort((a,b)=>monthlyEq(b)-monthlyEq(a))[0];
-  if(top){document.getElementById('m-top').textContent=top.name;document.getElementById('m-top-cost').textContent='€'+top.cost.toFixed(2)+'/'+(top.freq==='monthly'?'mese':'anno');}
+  const total=active.reduce((a,s)=>a+mthly(s),0);
 
-  // Banner rinnovi imminenti
-  const urgents=active.filter(s=>{const d=daysUntil(s.renewal);return d>=0&&d<=(s.notifDays||1);}).sort((a,b)=>daysUntil(a.renewal)-daysUntil(b.renewal));
-  const nc=document.getElementById('notif-container');
-  nc.innerHTML=urgents.length?'<div class="notif-banner"><i class="ti ti-bell-ringing"></i><div class="notif-text">Rinnovi imminenti: <strong>'+urgents.map(s=>s.name).join(', ')+'</strong></div></div>':'';
+  document.getElementById('mv-monthly').textContent='€'+total.toFixed(2);
+  document.getElementById('mv-annual').textContent='€'+Math.round(total*12).toLocaleString('it-IT');
+  document.getElementById('mv-count').textContent=active.length;
+  document.getElementById('mv-paused').textContent=paused.length?paused.length+' in pausa':'abbonamenti';
 
-  // Budget
-  const bc=document.getElementById('budget-container');
-  if(budget.enabled&&budget.amount>0){
-    const pct=Math.min(100,(total/budget.amount)*100);
-    const over=total>budget.amount;
-    bc.innerHTML='<div class="notif-banner" style="background:'+(over?'var(--danger-bg)':'var(--surface)')+'"><i class="ti ti-'+(over?'alert-circle':'target')+'" style="color:'+(over?'var(--danger)':'var(--text2)')+'"></i><div class="notif-text" style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:500">'+(over?'Budget superato!':'Budget mensile')+'</span><span style="font-family:var(--mono)">€'+total.toFixed(0)+' / €'+budget.amount+'</span></div><div class="budget-bar-wrap"><div class="budget-bar" style="width:'+pct+'%;background:'+(over?'var(--danger)':'var(--ok)')+'"></div></div></div></div>';
-  } else {bc.innerHTML='';}
+  const top=[...active].sort((a,b)=>mthly(b)-mthly(a))[0];
+  if(top){
+    document.getElementById('mv-top').textContent=top.name;
+    document.getElementById('mv-topcost').textContent='€'+top.cost.toFixed(2)+'/'+(top.freq==='monthly'?'mese':'anno');
+  }
 
-  // Duplicati
-  const dups=findDuplicates();
-  const dc=document.getElementById('duplicate-container');
-  if(dups.length){
-    dc.innerHTML=dups.map(([a,b])=>'<div class="duplicate-warn"><i class="ti ti-alert-triangle" style="flex-shrink:0;margin-top:1px"></i><span>Possibile duplicato: <strong>'+a+'</strong> e <strong>'+b+'</strong> sono nella stessa categoria con costi simili.</span></div>').join('');
-  } else {dc.innerHTML='';}
-
-  // Grafico torta
-  const catT={};
-  active.forEach(s=>{catT[s.cat]=(catT[s.cat]||0)+monthlyEq(s);});
-  const cats=Object.keys(catT);
-  const vals=cats.map(c=>+catT[c].toFixed(2));
-  const colors=cats.map(c=>CAT_COLORS[c]||CAT_COLORS.altro);
-  if(pieChart){pieChart.destroy();pieChart=null;}
-  pieChart=new Chart(document.getElementById('pieChart').getContext('2d'),{
-    type:'doughnut',
-    data:{labels:cats.map(c=>CAT_LABELS[c]||c),datasets:[{data:vals,backgroundColor:colors,borderWidth:0,hoverOffset:4}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' €'+ctx.parsed.toFixed(2)+'/mese'}}}}
+  // Banners
+  let html='';
+  const urgent=active.filter(s=>{ const d=daysTo(s.renewal); return d>=0 && d<=(s.nd||1); });
+  if(urgent.length){
+    html+='<div class="banner" style="background:var(--orabg)"><span style="font-size:inherit;color:var(--ora)">🔔</span><div class="bannertext">Rinnovi imminenti: <strong>'+urgent.map(s=>s.name).join(', ')+'</strong></div></div>';
+  }
+  if(cfg.budgetOn && cfg.budget>0){
+    const pct=Math.min(100,total/cfg.budget*100);
+    const over=total>cfg.budget;
+    html+='<div class="banner" style="background:'+(over?'var(--redbg)':'var(--sur)')+'"><span class="bannericon" style="font-size:18px;flex-shrink:0;margin-top:1px;color:'+(over?'var(--red)':'var(--tx2)')+'">'+(over?'⚠':'◎')+'</span>'
+      +'<div class="bannertext" style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-weight:500">'+(over?'Budget superato!':'Budget mensile')+'</span><span style="font-family:var(--mono)">€'+total.toFixed(0)+'/€'+cfg.budget+'</span></div>'
+      +'<div class="budgetbar"><div class="budgetfill" style="width:'+pct+'%;background:'+(over?'var(--red)':'var(--grn)')+'"></div></div></div></div>';
+  }
+  const dups=findDups();
+  dups.forEach(([a,b])=>{
+    html+='<div class="banner" style="background:var(--orabg)"><span style="font-size:inherit;color:var(--ora)">⚠</span><div class="bannertext">Possibile duplicato: <strong>'+a+'</strong> e <strong>'+b+'</strong></div></div>';
   });
-  document.getElementById('chart-legend').innerHTML=cats.map((c,i)=>'<span class="legend-item"><span class="legend-dot" style="background:'+colors[i]+'"></span>'+(CAT_LABELS[c]||c)+'</span>').join('');
+  document.getElementById('alertbox').innerHTML=html;
 
-  // Prossimi rinnovi
-  const upcoming=subs.filter(s=>!s.paused).slice().sort((a,b)=>new Date(a.renewal)-new Date(b.renewal)).slice(0,6);
-  const ul=document.getElementById('upcoming-list');
-  if(!upcoming.length){ul.innerHTML='<div class="empty"><i class="ti ti-calendar-off"></i><div class="empty-title">Nessun rinnovo</div></div>';return;}
-  ul.innerHTML=upcoming.map(s=>{
-    const days=daysUntil(s.renewal);const d=new Date(s.renewal);
-    return '<div class="renewal-row" onclick="openDetail(\''+s.id+'\')"><div class="renewal-date-box"><span class="renewal-day">'+d.getDate()+'</span><span class="renewal-month">'+MS[d.getMonth()].toUpperCase()+'</span></div><div class="renewal-info"><div class="renewal-name">'+s.name+'</div><div class="renewal-tag">'+badge(days,s.freq,false)+'</div></div><div class="renewal-right"><div class="renewal-amount">€'+s.cost.toFixed(2)+'</div><div style="font-size:11px;color:var(--text3)">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div></div>';
+  // Pie chart
+  const catTot={};
+  active.forEach(s=>{ catTot[s.cat]=(catTot[s.cat]||0)+mthly(s); });
+  const cats=Object.keys(catTot);
+  const vals=cats.map(c=>+catTot[c].toFixed(2));
+  const cols=cats.map(c=>CATCOL[c]||CATCOL.alt);
+  if(pieChart){ pieChart.destroy(); pieChart=null; }
+  const ctx=document.getElementById('piechart').getContext('2d');
+  pieChart=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:cats.map(c=>CATLBL[c]||c), datasets:[{data:vals, backgroundColor:cols, borderWidth:0, hoverOffset:4}]},
+    options:{responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>' €'+ctx.parsed.toFixed(2)+'/mese'}}}}
+  });
+  document.getElementById('pielegend').innerHTML=cats.map((c,i)=>'<span class="litem"><span class="ldot" style="background:'+cols[i]+'"></span>'+( CATLBL[c]||c)+'</span>').join('');
+
+  // Upcoming
+  const up=[...subs].filter(s=>!s.paused).sort((a,b)=>new Date(a.renewal)-new Date(b.renewal)).slice(0,6);
+  if(!up.length){ document.getElementById('upcoming').innerHTML='<div class="empty"><span style="font-size:inherit;">📅</span><div class="empty-t">Nessun rinnovo</div></div>'; return; }
+  document.getElementById('upcoming').innerHTML=up.map(s=>{
+    const d=new Date(s.renewal);
+    return '<div class="rrow" onclick="openDetail(\''+s.id+'\')">'
+      +'<div class="rdbox"><span class="rday">'+d.getDate()+'</span><span class="rmon">'+MSSHORT[d.getMonth()].toUpperCase()+'</span></div>'
+      +'<div class="rinfo"><div class="rname">'+s.name+'</div><div class="rtag">'+badge(s)+'</div></div>'
+      +'<div><div class="ramount">€'+s.cost.toFixed(2)+'</div><div class="rfreq">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div>'
+      +'</div>';
   }).join('');
+}
+
+// ─── LIST ────────────────────────────────────────────────────────────────────
+let curFilter='tutti';
+
+function buildFilters(){
+  const cats=['tutti',...Object.keys(CATLBL),'paused'];
+  const lbl={tutti:'Tutti',paused:'In pausa',...CATLBL};
+  document.getElementById('filterrow').innerHTML=cats.map(c=>
+    '<div class="chip'+(c===curFilter?' on':'')+'" onclick="setFilter(\''+c+'\',this)">'+( lbl[c]||c)+'</div>'
+  ).join('');
 }
 
 function setFilter(f,el){
-  currentFilter=f;
-  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  renderList();
+  curFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  drawList();
 }
 
-function renderList(){
-  const sort=document.getElementById('sort-select').value;
-  let filtered=subs.filter(s=>{
-    if(currentFilter==='tutti')return true;
-    if(currentFilter==='paused')return s.paused;
-    return s.cat===currentFilter&&!s.paused;
+function drawList(){
+  buildFilters();
+  const sort=document.getElementById('sortsel').value;
+  let arr=subs.filter(s=>{
+    if(curFilter==='tutti') return !s.paused;
+    if(curFilter==='paused') return s.paused;
+    return s.cat===curFilter && !s.paused;
   });
-  if(sort==='cost-desc')filtered.sort((a,b)=>monthlyEq(b)-monthlyEq(a));
-  else if(sort==='cost-asc')filtered.sort((a,b)=>monthlyEq(a)-monthlyEq(b));
-  else if(sort==='date')filtered.sort((a,b)=>new Date(a.renewal)-new Date(b.renewal));
-  else if(sort==='name')filtered.sort((a,b)=>a.name.localeCompare(b.name));
-  else{// cat
-    const order=['intrattenimento','ai','cloud','fitness','telefonia','finanza','altro'];
-    filtered.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
+  if(sort==='cost') arr=[...arr].sort((a,b)=>mthly(b)-mthly(a));
+  else if(sort==='date') arr=[...arr].sort((a,b)=>new Date(a.renewal)-new Date(b.renewal));
+  else if(sort==='name') arr=[...arr].sort((a,b)=>a.name.localeCompare(b.name));
+  else { // cat
+    const ord=['int','ai','cloud','fit','tel','fin','alt'];
+    arr=[...arr].sort((a,b)=>ord.indexOf(a.cat)-ord.indexOf(b.cat));
   }
-
-  let html='',lastCat='';
-  filtered.forEach(s=>{
-    const c=ICON_COLORS[s.colorIdx||0];
-    if(sort==='cat'&&s.cat!==lastCat&&currentFilter==='tutti'){html+='<div class="section-title">'+(CAT_LABELS[s.cat]||s.cat)+'</div>';lastCat=s.cat;}
-    html+='<div class="sub-card'+(s.paused?' paused':'')+'" onclick="openDetail(\''+s.id+'\')"><div class="sub-icon" style="background:'+c.bg+'"><i class="ti '+s.icon+'" style="color:'+c.fg+'"></i></div><div class="sub-info"><div class="sub-name">'+s.name+'</div><div class="sub-renewal">'+(s.paused?'in pausa':'rinnovo '+fmtS(s.renewal))+'</div></div><div class="sub-right"><div class="sub-cost">€'+s.cost.toFixed(2)+'</div><div class="sub-freq">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div></div>';
+  if(!arr.length){ document.getElementById('listcont').innerHTML='<div class="empty"><span style="font-size:inherit;">📥</span><div class="empty-t">Nessun abbonamento</div></div>'; return; }
+  let html='', lastCat='';
+  arr.forEach(s=>{
+    if(sort==='cat' && curFilter==='tutti' && s.cat!==lastCat){
+      html+='<div class="stitle">'+(CATLBL[s.cat]||s.cat)+'</div>';
+      lastCat=s.cat;
+    }
+    html+='<div class="subcard'+(s.paused?' paused':'')+'" onclick="openDetail(\''+s.id+'\')">'
+      +iconHTML(s)
+      +'<div class="sinfo"><div class="sname">'+s.name+'</div><div class="ssub">'+(s.paused?'in pausa':'rinnovo '+fmtShort(s.renewal))+'</div></div>'
+      +'<div class="sright"><div class="scost">€'+s.cost.toFixed(2)+'</div><div class="sfreq">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div>'
+      +'</div>';
   });
-  document.getElementById('cat-list').innerHTML=html||'<div class="empty"><i class="ti ti-inbox"></i><div class="empty-title">Nessun abbonamento</div></div>';
+  document.getElementById('listcont').innerHTML=html;
 }
 
-function renderCalendar(){
-  const sorted=subs.filter(s=>!s.paused).slice().sort((a,b)=>new Date(a.renewal)-new Date(b.renewal));
-  const el=document.getElementById('calendar-list');
-  if(!sorted.length){el.innerHTML='<div class="empty"><i class="ti ti-calendar"></i><div class="empty-title">Nessun rinnovo</div></div>';return;}
-  el.innerHTML=sorted.map(s=>{
-    const days=daysUntil(s.renewal);const d=new Date(s.renewal);
-    return '<div class="renewal-row" onclick="openDetail(\''+s.id+'\')"><div class="renewal-date-box"><span class="renewal-day">'+d.getDate()+'</span><span class="renewal-month">'+MS[d.getMonth()].toUpperCase()+'</span></div><div class="renewal-info"><div class="renewal-name">'+s.name+'</div><div class="renewal-tag">'+badge(days,s.freq,false)+'</div></div><div class="renewal-right"><div class="renewal-amount">€'+s.cost.toFixed(2)+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div></div>';
-  }).join('');
+// ─── CALENDAR ────────────────────────────────────────────────────────────────
+let calY=new Date().getFullYear(), calM=new Date().getMonth(), calSel=null;
+
+function calMove(dir){
+  calM+=dir;
+  if(calM>11){calM=0;calY++;}
+  if(calM<0){calM=11;calY--;}
+  calSel=null;
+  drawCalendar();
 }
 
-function setHistoryTab(tab,el){
-  currentHistoryTab=tab;
-  document.querySelectorAll('.tab-inner-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('history-log').style.display=tab==='log'?'block':'none';
-  document.getElementById('history-chart-wrap').style.display=tab==='chart'?'block':'none';
-  if(tab==='chart')renderBarChart();
-}
+function drawCalendar(){
+  // Month label
+  document.getElementById('calmonth').textContent=
+    MSLONG[calM].charAt(0).toUpperCase()+MSLONG[calM].slice(1)+' '+calY;
 
-function renderHistory(){
-  const sorted=[...history].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const el=document.getElementById('history-log');
-  if(!sorted.length){el.innerHTML='<div class="empty"><i class="ti ti-history"></i><div class="empty-title">Nessun pagamento registrato</div><div style="font-size:13px;color:var(--text3)">I rinnovi vengono registrati automaticamente</div></div>';return;}
-  const total=sorted.reduce((a,h)=>a+h.amount,0);
-  el.innerHTML='<div style="background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px 16px;margin-bottom:14px"><div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">Totale pagato</div><div style="font-size:24px;font-weight:600;font-family:var(--mono)">€'+total.toFixed(2)+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+sorted.length+' pagamenti registrati</div></div><div style="background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:4px 16px">'+sorted.map(h=>'<div class="history-row"><div><div class="history-name">'+h.name+'</div><div class="history-date">'+fmtF(h.date)+'</div></div><div class="history-amount">-€'+h.amount.toFixed(2)+'</div></div>').join('')+'</div>';
-}
-
-function renderBarChart(){
-  const months=[];const today=new Date();
-  for(let i=11;i>=0;i--){const d=new Date(today.getFullYear(),today.getMonth()-i,1);months.push({year:d.getFullYear(),month:d.getMonth(),label:MS[d.getMonth()]+' '+String(d.getFullYear()).slice(2)});}
-  const vals=months.map(m=>{
-    return history.filter(h=>{const d=new Date(h.date);return d.getFullYear()===m.year&&d.getMonth()===m.month;}).reduce((a,h)=>a+h.amount,0);
+  // Map day -> subs
+  const byDay={};
+  subs.filter(s=>!s.paused).forEach(s=>{
+    const d=new Date(s.renewal);
+    if(d.getFullYear()===calY && d.getMonth()===calM){
+      const day=d.getDate();
+      if(!byDay[day]) byDay[day]=[];
+      byDay[day].push(s);
+    }
   });
+
+  const today=new Date(); today.setHours(0,0,0,0);
+  const todayN=(today.getFullYear()===calY && today.getMonth()===calM) ? today.getDate() : -1;
+  const firstDow=new Date(calY,calM,1).getDay(); // 0=Sun
+  const offset=firstDow===0?6:firstDow-1;        // Mon-based offset
+  const daysInMonth=new Date(calY,calM+1,0).getDate();
+
+  let html='';
+  for(let i=0;i<offset;i++) html+='<div></div>';
+
+  for(let d=1;d<=daysInMonth;d++){
+    const has=!!byDay[d];
+    const isToday=d===todayN;
+    const isSel=d===calSel;
+    const dow=new Date(calY,calM,d).getDay();
+    const isSun=dow===0;
+
+    let cls='calday';
+    if(has) cls+=' has';
+    if(isToday && !isSel) cls+=' today';
+    if(isSel) cls+=' sel';
+    if(isSun) cls+=' sun';
+
+    const fw=isToday||isSel?700:400;
+    let dots='';
+    if(has){
+      const cats=[...new Set(byDay[d].map(s=>s.cat))].slice(0,3);
+      dots='<div class="caldots">'+cats.map(c=>'<div class="caldot" style="background:'+(CATCOL[c]||CATCOL.alt)+'"></div>').join('')+'</div>';
+    }
+
+    html+='<div class="'+cls+'" '+(has?'onclick="calClick('+d+')"':'')+'>'
+      +'<span class="caldaynum" style="font-weight:'+fw+'">'+d+'</span>'
+      +dots+'</div>';
+  }
+  document.getElementById('calgrid').innerHTML=html;
+
+  // Detail panel
+  const det=document.getElementById('caldetail');
+  if(calSel && byDay[calSel]){
+    const items=byDay[calSel];
+    det.innerHTML='<div class="caldetail">'
+      +'<div class="caldetail-hd">'+calSel+' '+MSLONG[calM]+' '+calY+'</div>'
+      +items.map(s=>'<div class="rrow" style="padding:12px 16px" onclick="openDetail(\''+s.id+'\')">'
+        +iconHTML(s,36)
+        +'<div class="rinfo" style="margin-left:10px"><div class="rname">'+s.name+'</div><div class="rtag">'+badge(s)+'</div></div>'
+        +'<div><div class="ramount">€'+s.cost.toFixed(2)+'</div><div class="rfreq">'+(s.freq==='monthly'?'mensile':'annuale')+'</div></div>'
+        +'</div>').join('')
+      +'</div>';
+  } else {
+    det.innerHTML='';
+  }
+}
+
+function calClick(d){
+  calSel = calSel===d ? null : d;
+  drawCalendar();
+}
+
+// ─── HISTORY ─────────────────────────────────────────────────────────────────
+let barChart=null;
+
+function switchHistTab(tab){
+  document.getElementById('itab-log').classList.toggle('on', tab==='log');
+  document.getElementById('itab-chart').classList.toggle('on', tab==='chart');
+  document.getElementById('histlog').style.display=tab==='log'?'block':'none';
+  document.getElementById('histchart').style.display=tab==='chart'?'block':'none';
+  if(tab==='chart') drawBarChart();
+}
+
+function drawHistory(){
+  const sorted=[...paylog].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!sorted.length){
+    document.getElementById('histlog').innerHTML='<div class="empty"><span style="font-size:inherit;">↺</span><div class="empty-t">Nessun pagamento</div><div class="empty-s">I rinnovi vengono registrati automaticamente</div></div>';
+    return;
+  }
+  const tot=sorted.reduce((a,h)=>a+h.amount,0);
+  document.getElementById('histlog').innerHTML=
+    '<div class="card"><div class="mlabel">Totale pagato</div><div class="mval">€'+tot.toFixed(2)+'</div><div class="msub">'+sorted.length+' pagamenti</div></div>'
+    +'<div class="card" style="padding:4px 16px">'+sorted.map(h=>'<div class="hrow"><div><div class="hname">'+h.name+'</div><div class="hdate">'+fmtLong(h.date)+'</div></div><div class="hamount">-€'+h.amount.toFixed(2)+'</div></div>').join('')+'</div>';
+}
+
+function drawBarChart(){
+  const today=new Date();
+  const months=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date(today.getFullYear(), today.getMonth()-i, 1);
+    months.push({y:d.getFullYear(), m:d.getMonth(), lbl:MSSHORT[d.getMonth()]+"'"+String(d.getFullYear()).slice(2)});
+  }
+  const vals=months.map(mo=>paylog.filter(h=>{ const d=new Date(h.date); return d.getFullYear()===mo.y&&d.getMonth()===mo.m; }).reduce((a,h)=>a+h.amount,0));
   if(barChart){barChart.destroy();barChart=null;}
-  const isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
-  barChart=new Chart(document.getElementById('barChart').getContext('2d'),{
+  const dark=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  barChart=new Chart(document.getElementById('barchart').getContext('2d'),{
     type:'bar',
-    data:{labels:months.map(m=>m.label),datasets:[{data:vals,backgroundColor:isDark?'rgba(255,255,255,0.15)':'rgba(0,0,0,0.12)',borderRadius:6,hoverBackgroundColor:'#D85A30'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' €'+ctx.parsed.y.toFixed(2)}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.05)'},ticks:{callback:v=>'€'+v,font:{size:10}}}}}
+    data:{labels:months.map(m=>m.lbl), datasets:[{data:vals, backgroundColor:dark?'rgba(255,255,255,.15)':'rgba(0,0,0,.12)', borderRadius:6, hoverBackgroundColor:'#D85A30'}]},
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' €'+c.parsed.y.toFixed(2)}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10}}}, y:{grid:{color:dark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)'},ticks:{callback:v=>'€'+v,font:{size:10}}}}}
   });
 }
 
-function renderAll(){renderOverview();renderList();renderCalendar();renderHistory();}
-
+// ─── DETAIL MODAL ────────────────────────────────────────────────────────────
 function openDetail(id){
-  const s=subs.find(x=>x.id===id);if(!s)return;
-  const c=ICON_COLORS[s.colorIdx||0];
-  const days=daysUntil(s.renewal);
-  const m=monthlyEq(s);
+  const s=subs.find(x=>x.id===id); if(!s) return;
+  const m=mthly(s);
   const ov=document.createElement('div');
-  ov.className='modal-overlay open';ov.id='detail-ov';
-  ov.onclick=e=>{if(e.target===ov)ov.remove();};
-  ov.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-header"><div style="display:flex;align-items:center;gap:12px"><div class="sub-icon" style="background:'+c.bg+';border-radius:12px;width:48px;height:48px;font-size:22px"><i class="ti '+s.icon+'" style="color:'+c.fg+'"></i></div><div><div class="modal-title">'+s.name+'</div><div class="modal-sub">'+(CAT_LABELS[s.cat]||s.cat)+(s.paused?' · <span style="color:var(--text3)">in pausa</span>':'')+'</div></div></div></div><div class="modal-body"><div class="modal-detail-row"><span class="modal-detail-label">Costo</span><span class="modal-detail-value" style="font-family:var(--mono);font-size:18px;font-weight:600">€'+s.cost.toFixed(2)+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Frequenza</span><span class="modal-detail-value">'+(s.freq==='monthly'?'Mensile':'Annuale')+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Equiv. mensile</span><span class="modal-detail-value">€'+m.toFixed(2)+'/mese</span></div><div class="modal-detail-row"><span class="modal-detail-label">Prossimo rinnovo</span><span class="modal-detail-value">'+fmtF(s.renewal)+' '+badge(days,s.freq,s.paused)+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Notifica anticipata</span><span class="modal-detail-value">'+(s.notifDays&&s.notifDays>0?s.notifDays+' giorno/i prima':'Disattivata')+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Costo annuale</span><span class="modal-detail-value">€'+(m*12).toFixed(2)+'/anno</span></div><div class="modal-actions"><button class="btn" onclick="document.getElementById(\'detail-ov\').remove();openEditForm(\''+s.id+'\')"><i class="ti ti-edit"></i> Modifica</button><button class="btn '+(s.paused?'btn-ok':'btn-warn')+'" onclick="document.getElementById(\'detail-ov\').remove();quickTogglePause(\''+s.id+'\')"><i class="ti ti-'+(s.paused?'player-play':'player-pause')+'"></i> '+(s.paused?'Riattiva':'Pausa')+'</button></div></div></div>';
+  ov.className='overlay on'; ov.id='det-ov';
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); };
+  ov.innerHTML='<div class="modal">'
+    +'<div class="mhandle"></div>'
+    +'<div class="mhead"><div style="display:flex;align-items:center;gap:12px">'+iconHTML(s,48)
+    +'<div><div class="mtitle">'+s.name+'</div><div class="msub2">'+(CATLBL[s.cat]||s.cat)+(s.paused?' · <em style="color:var(--tx3)">in pausa</em>':'')+'</div></div></div></div>'
+    +'<div class="mbody">'
+    +'<div class="drow"><span class="dlabel">Costo</span><span class="dval" style="font-family:var(--mono);font-size:18px;font-weight:600">€'+s.cost.toFixed(2)+'</span></div>'
+    +'<div class="drow"><span class="dlabel">Frequenza</span><span class="dval">'+(s.freq==='monthly'?'Mensile':'Annuale')+'</span></div>'
+    +'<div class="drow"><span class="dlabel">Equiv. mensile</span><span class="dval">€'+m.toFixed(2)+'/mese</span></div>'
+    +'<div class="drow"><span class="dlabel">Prossimo rinnovo</span><span class="dval">'+fmtLong(s.renewal)+' '+badge(s)+'</span></div>'
+    +'<div class="drow"><span class="dlabel">Costo annuale</span><span class="dval">€'+(m*12).toFixed(2)+'/anno</span></div>'
+    +'<div class="mactions">'
+    +'<button class="btn" onclick="document.getElementById(\'det-ov\').remove();openEdit(\''+s.id+'\')"><span style="font-size:inherit;">✎</span> Modifica</button>'
+    +'<button class="btn '+(s.paused?'bgrn2':'bora2')+'" onclick="quickPause(\''+s.id+'\')">'+(s.paused?'▶ Riattiva':'⏸ Pausa')+'</button>'
+    +'</div></div></div>';
   document.body.appendChild(ov);
 }
 
-function quickTogglePause(id){
-  const s=subs.find(x=>x.id===id);if(!s)return;
-  s.paused=!s.paused;saveAll();renderAll();
+function quickPause(id){
+  const s=subs.find(x=>x.id===id); if(!s) return;
+  s.paused=!s.paused; saveAll();
+  document.getElementById('det-ov')?.remove();
+  drawAll();
 }
 
-function confirmDelete(id){
-  const s=subs.find(x=>x.id===id);if(!s)return;
-  if(confirm('Eliminare "'+s.name+'"?')){subs=subs.filter(x=>x.id!==id);saveAll();renderAll();}
-}
-
-function showPage(name,tabIdx){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===tabIdx));
-  document.getElementById('nav-title').textContent={overview:'Abbonamenti',list:'Lista',calendar:'Rinnovi',history:'Storico',add:editingId?'Modifica':'Nuovo'}[name];
-  document.getElementById('add-btn').style.display=name==='add'?'none':'flex';
-  if(name!=='add')prevPageIdx=tabIdx;
-  if(name==='history')renderHistory();
-}
+// ─── ADD / EDIT ──────────────────────────────────────────────────────────────
+let selColor=0;
 
 function buildColorPicker(){
-  document.getElementById('color-picker').innerHTML=ICON_COLORS.map((c,i)=>'<div class="color-dot" style="background:'+c.bg+';border:2px solid '+(i===selectedColor?'var(--text)':'transparent')+'" onclick="selectColor('+i+')"><i class="ti ti-star" style="color:'+c.fg+';font-size:13px"></i></div>').join('');
+  document.getElementById('cpick').innerHTML=ICONCOL.map((c,i)=>
+    '<div class="cdot" style="background:'+c.bg+';border:2px solid '+(i===selColor?'var(--tx)':'transparent')+'" onclick="pickColor('+i+')">'
+    +'<span style="color:'+c.fg+';font-size:14px">★</span></div>'
+  ).join('');
 }
-function selectColor(i){selectedColor=i;buildColorPicker();}
+function pickColor(i){ selColor=i; buildColorPicker(); }
 
-function openAddForm(){
-  editingId=null;selectedColor=0;
+function openAdd(){
+  editingId=null; selColor=0;
   document.getElementById('f-name').value='';
   document.getElementById('f-cost').value='';
   document.getElementById('f-freq').value='monthly';
-  const nd=new Date();nd.setMonth(nd.getMonth()+1);
-  document.getElementById('f-date').value=nd.toISOString().split('T')[0];
-  document.getElementById('f-cat').value='intrattenimento';
-  document.getElementById('f-notif-days').value='1';
+  document.getElementById('f-notif').value='1';
+  document.getElementById('f-cat').value='int';
   document.getElementById('f-icon').value='ti-device-tv';
-  document.getElementById('delete-container').style.display='none';
-  buildColorPicker();showPage('add',-1);
+  const nd=new Date(); nd.setMonth(nd.getMonth()+1);
+  document.getElementById('f-date').value=nd.toISOString().split('T')[0];
+  document.getElementById('editbtns').style.display='none';
+  buildColorPicker();
+  showPage('add',-1);
 }
 
-function openEditForm(id){
-  const s=subs.find(x=>x.id===id);if(!s)return;
-  editingId=id;selectedColor=s.colorIdx||0;
+function openEdit(id){
+  const s=subs.find(x=>x.id===id); if(!s) return;
+  editingId=id; selColor=s.ci||0;
   document.getElementById('f-name').value=s.name;
   document.getElementById('f-cost').value=s.cost;
   document.getElementById('f-freq').value=s.freq;
   document.getElementById('f-date').value=s.renewal;
   document.getElementById('f-cat').value=s.cat;
-  document.getElementById('f-notif-days').value=s.notifDays||1;
+  document.getElementById('f-notif').value=s.nd||1;
   document.getElementById('f-icon').value=s.icon;
-  const dc=document.getElementById('delete-container');
-  dc.style.display='flex';
-  const pb=document.getElementById('pause-btn');
-  const pl=document.getElementById('pause-label');
-  pb.className='btn '+(s.paused?'btn-ok':'btn-warn');
-  pl.textContent=s.paused?'Riattiva abbonamento':'Metti in pausa';
-  buildColorPicker();showPage('add',-1);
+  const eb=document.getElementById('editbtns');
+  eb.style.display='flex';
+  document.getElementById('pausebtn').className='btn '+(s.paused?'bgrn2':'bora2');
+  document.getElementById('pauselbl').textContent=s.paused?'Riattiva abbonamento':'Metti in pausa';
+  buildColorPicker();
+  showPage('add',-1);
 }
 
 function cancelAdd(){
   editingId=null;
   const pages=['overview','list','calendar','history'];
-  showPage(pages[prevPageIdx]||'overview',prevPageIdx);
+  showPage(pages[prevPageIdx]||'overview', prevPageIdx);
 }
 
 function saveSub(){
@@ -546,118 +798,140 @@ function saveSub(){
   const date=document.getElementById('f-date').value;
   const cat=document.getElementById('f-cat').value;
   const icon=document.getElementById('f-icon').value;
-  const notifDays=parseInt(document.getElementById('f-notif-days').value)||1;
-  if(!name||isNaN(cost)||cost<=0||!date){alert('Compila tutti i campi.');return;}
+  const nd=parseInt(document.getElementById('f-notif').value)||1;
+  if(!name||isNaN(cost)||cost<=0||!date){ alert('Compila tutti i campi.'); return; }
   if(editingId){
     const idx=subs.findIndex(x=>x.id===editingId);
-    if(idx>=0)subs[idx]={...subs[idx],name,cost,freq,renewal:date,cat,icon,colorIdx:selectedColor,notifDays};
+    if(idx>=0) subs[idx]={...subs[idx], name, cost, freq, renewal:date, cat, icon, ci:selColor, nd};
   } else {
-    subs.push({id:Date.now().toString(),name,cost,freq,renewal:date,cat,icon,colorIdx:selectedColor,notifDays,paused:false});
+    subs.push({id:Date.now().toString(), name, cost, freq, renewal:date, cat, icon, ci:selColor, nd, paused:false});
   }
-  saveAll();renderAll();cancelAdd();
+  saveAll(); cancelAdd();
 }
 
 function togglePause(){
-  if(!editingId)return;
-  const s=subs.find(x=>x.id===editingId);if(!s)return;
-  s.paused=!s.paused;saveAll();renderAll();
-  const pb=document.getElementById('pause-btn');
-  const pl=document.getElementById('pause-label');
-  pb.className='btn '+(s.paused?'btn-ok':'btn-warn');
-  pl.textContent=s.paused?'Riattiva abbonamento':'Metti in pausa';
+  if(!editingId) return;
+  const s=subs.find(x=>x.id===editingId); if(!s) return;
+  s.paused=!s.paused; saveAll();
+  document.getElementById('pausebtn').className='btn '+(s.paused?'bgrn2':'bora2');
+  document.getElementById('pauselbl').textContent=s.paused?'Riattiva abbonamento':'Metti in pausa';
 }
 
-function deleteCurrentSub(){
-  if(!editingId)return;
+function deleteSub(){
+  if(!editingId) return;
   const s=subs.find(x=>x.id===editingId);
-  if(s&&confirm('Eliminare "'+s.name+'"?')){subs=subs.filter(x=>x.id!==editingId);saveAll();renderAll();editingId=null;cancelAdd();}
+  if(s && confirm('Eliminare "'+s.name+'"?')){
+    subs=subs.filter(x=>x.id!==editingId);
+    saveAll(); editingId=null; cancelAdd();
+  }
 }
 
-// ── ESPORTA ────────────────────────────────────────────────────
-function openExportPanel(){
-  const ov=document.createElement('div');ov.className='modal-overlay open';ov.id='export-ov';
-  ov.onclick=e=>{if(e.target===ov)ov.remove();};
-  ov.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-header"><div class="modal-title">Esporta dati</div><div class="modal-sub">Scarica i tuoi abbonamenti</div></div><div class="modal-body"><div class="modal-actions" style="flex-direction:column"><button class="btn btn-primary" onclick="exportCSV()"><i class="ti ti-file-type-csv"></i> Esporta come CSV</button><button class="btn" onclick="exportJSON()" style="margin-top:10px"><i class="ti ti-file-type-json"></i> Esporta come JSON (backup)</button></div><button class="btn" style="width:100%;margin-top:10px" onclick="document.getElementById(\'export-ov\').remove()">Chiudi</button></div></div>';
+// ─── EXPORT ──────────────────────────────────────────────────────────────────
+function openExport(){
+  const ov=document.createElement('div');
+  ov.className='overlay on'; ov.id='exp-ov';
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); };
+  ov.innerHTML='<div class="modal"><div class="mhandle"></div>'
+    +'<div class="mhead"><div class="mtitle">Esporta</div></div>'
+    +'<div class="mbody" style="display:flex;flex-direction:column;gap:10px">'
+    +'<button class="btn bpri" onclick="exportCSV()"><span style="font-size:inherit;">CSV</span> Esporta come CSV</button>'
+    +'<button class="btn" onclick="exportJSON()"><span style="font-size:inherit;">JSON</span> Backup JSON</button>'
+    +'<button class="btn" onclick="document.getElementById(\'exp-ov\').remove()">Chiudi</button>'
+    +'</div></div>';
   document.body.appendChild(ov);
 }
 
 function exportCSV(){
   const active=subs.filter(s=>!s.paused);
   const rows=[['Nome','Costo','Frequenza','Mensile','Prossimo rinnovo','Categoria']];
-  active.forEach(s=>rows.push([s.name,s.cost.toFixed(2),s.freq==='monthly'?'Mensile':'Annuale',monthlyEq(s).toFixed(2),s.renewal,CAT_LABELS[s.cat]||s.cat]));
-  const total=active.reduce((a,s)=>a+monthlyEq(s),0);
-  rows.push([]);rows.push(['TOTALE MENSILE','','',''+total.toFixed(2),'','']);
+  active.forEach(s=>rows.push([s.name, s.cost.toFixed(2), s.freq==='monthly'?'Mensile':'Annuale', mthly(s).toFixed(2), s.renewal, CATLBL[s.cat]||s.cat]));
+  const tot=active.reduce((a,s)=>a+mthly(s),0);
+  rows.push([],[' TOTALE MENSILE','','',''+tot.toFixed(2),'','']);
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
-  download('abbonamenti.csv','data:text/csv;charset=utf-8,'+encodeURIComponent(csv));
+  dl('abbonamenti.csv','data:text/csv;charset=utf-8,'+encodeURIComponent(csv));
 }
+function exportJSON(){ dl('abbonamenti_backup.json','data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({subs,paylog},null,2))); }
+function dl(name,url){ const a=document.createElement('a'); a.href=url; a.download=name; a.click(); }
 
-function exportJSON(){
-  download('abbonamenti_backup.json','data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({subs,history},null,2)));
-}
-
-function download(filename,dataUrl){
-  const a=document.createElement('a');a.href=dataUrl;a.download=filename;a.click();
-}
-
-// ── BUDGET ────────────────────────────────────────────────────
-function openNotifPanel(){
-  const supported='Notification' in window;
-  const permLabel=!supported?'Non supportato':Notification.permission==='granted'?'✅ Abilitato':Notification.permission==='denied'?'❌ Bloccato':'⏳ Non richiesto';
-  const ov=document.createElement('div');ov.className='modal-overlay open';ov.id='notif-ov';
-  ov.onclick=e=>{if(e.target===ov)ov.remove();};
-  ov.innerHTML='<div class="modal"><div class="modal-handle"></div><div class="modal-header"><div class="modal-title">Impostazioni</div></div><div class="modal-body"><div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px">Notifiche</div><div class="modal-detail-row"><span class="modal-detail-label">Permesso browser</span><span class="modal-detail-value">'+permLabel+'</span></div><div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:10px"><span class="modal-detail-label">Attiva notifiche push</span><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><span class="toggle-switch"><input type="checkbox" id="notif-toggle" '+(settings.enabled?'checked':'')+' ><span class="toggle-slider"></span></span><span style="font-size:14px">Avviso '+(settings.daysBefore||1)+' giorno/i prima</span></label></div><div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;margin:16px 0 12px">Budget mensile</div><div class="modal-detail-row" style="flex-direction:column;align-items:flex-start;gap:10px"><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><span class="toggle-switch"><input type="checkbox" id="budget-toggle" '+(budget.enabled?'checked':'')+' ><span class="toggle-slider"></span></span><span style="font-size:14px">Attiva budget</span></label><input class="form-input" type="number" id="budget-amount" value="'+(budget.amount||300)+'" placeholder="es. 300" min="0" style="margin-top:4px"></div><div class="modal-actions" style="margin-top:20px"><button class="btn" onclick="document.getElementById(\'notif-ov\').remove()">Chiudi</button><button class="btn btn-primary" onclick="saveSettings()">Salva</button></div><div style="margin-top:12px"><button class="btn" style="width:100%;color:var(--text2)" onclick="testNotif()"><i class="ti ti-bell"></i> Notifica di prova</button></div></div></div>';
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+function openSettings(){
+  const perm='Notification' in window ? Notification.permission : 'unsupported';
+  const permLbl={granted:'✅ Abilitato',denied:'❌ Bloccato',default:'⏳ Non richiesto',unsupported:'Non supportato'}[perm]||perm;
+  const ov=document.createElement('div');
+  ov.className='overlay on'; ov.id='cfg-ov';
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); };
+  ov.innerHTML='<div class="modal"><div class="mhandle"></div>'
+    +'<div class="mhead"><div class="mtitle">Impostazioni</div></div>'
+    +'<div class="mbody">'
+    +'<div class="stitle" style="margin-top:0">Notifiche</div>'
+    +'<div class="drow"><span class="dlabel">Permesso</span><span class="dval">'+permLbl+'</span></div>'
+    +'<div class="drow" style="flex-direction:column;align-items:flex-start;gap:10px">'
+    +'<span class="dlabel">Avvisi rinnovi push</span>'
+    +'<label style="display:flex;align-items:center;gap:10px;cursor:pointer">'
+    +'<span class="toggle"><input type="checkbox" id="cfg-notif" '+(cfg.notif?'checked':'')+' ><span class="tslider"></span></span>'
+    +'<span style="font-size:14px">Attiva notifiche</span></label></div>'
+    +'<div class="stitle">Budget mensile</div>'
+    +'<div class="drow" style="flex-direction:column;align-items:flex-start;gap:10px">'
+    +'<label style="display:flex;align-items:center;gap:10px;cursor:pointer">'
+    +'<span class="toggle"><input type="checkbox" id="cfg-budon" '+(cfg.budgetOn?'checked':'')+' ><span class="tslider"></span></span>'
+    +'<span style="font-size:14px">Attiva budget</span></label>'
+    +'<input class="finput" type="number" id="cfg-budamt" value="'+(cfg.budget||300)+'" placeholder="es. 300" min="0"></div>'
+    +'<div class="mactions" style="margin-top:20px">'
+    +'<button class="btn" onclick="document.getElementById(\'cfg-ov\').remove()">Chiudi</button>'
+    +'<button class="btn bpri" onclick="saveSettings()">Salva</button></div>'
+    +'<button class="btn" style="width:100%;margin-top:10px;color:var(--tx2)" onclick="testNotif()"><span style="font-size:inherit;">🔔</span> Notifica di prova</button>'
+    +'</div></div>';
   document.body.appendChild(ov);
 }
 
 async function saveSettings(){
-  const toggle=document.getElementById('notif-toggle');
-  const bt=document.getElementById('budget-toggle');
-  const ba=document.getElementById('budget-amount');
-  if(toggle&&toggle.checked&&Notification.permission!=='granted'){
+  const notifToggle=document.getElementById('cfg-notif');
+  if(notifToggle?.checked && 'Notification' in window && Notification.permission!=='granted'){
     const p=await Notification.requestPermission();
-    if(p!=='granted'){toggle.checked=false;}
+    if(p!=='granted'){ notifToggle.checked=false; }
   }
-  settings.enabled=toggle?toggle.checked:false;
-  settings.lastCheck=null;
-  budget.enabled=bt?bt.checked:false;
-  budget.amount=ba?parseFloat(ba.value)||0:0;
+  cfg.notif=document.getElementById('cfg-notif')?.checked||false;
+  cfg.budgetOn=document.getElementById('cfg-budon')?.checked||false;
+  cfg.budget=parseFloat(document.getElementById('cfg-budamt')?.value)||0;
+  cfg.lastCheck=null;
   saveAll();
-  document.getElementById('notif-ov')?.remove();
-  updateNotifBtn();renderAll();
-  if(settings.enabled)checkNotifs();
+  document.getElementById('cfg-ov')?.remove();
+  updateNotifBtn();
+  drawOverview();
+  if(cfg.notif) checkNotifs();
 }
 
 function sendNotif(title,body){
-  if(Notification.permission!=='granted')return;
-  try{new Notification(title,{body});}catch(e){}
+  if('Notification' in window && Notification.permission==='granted'){
+    try{ new Notification(title,{body}); }catch(e){}
+  }
 }
-
 async function testNotif(){
-  if('Notification' in window&&Notification.permission!=='granted')await Notification.requestPermission();
-  sendNotif('🔔 Notifica di prova','Le notifiche per Abbonamenti funzionano!');
+  if('Notification' in window && Notification.permission!=='granted') await Notification.requestPermission();
+  sendNotif('🔔 Prova','Le notifiche funzionano correttamente!');
 }
-
 function checkNotifs(){
-  if(!settings.enabled||Notification.permission!=='granted')return;
-  const today=new Date();today.setHours(0,0,0,0);
-  const todayStr=today.toISOString().split('T')[0];
-  if(settings.lastCheck===todayStr)return;
+  if(!cfg.notif || !('Notification' in window) || Notification.permission!=='granted') return;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const ts=today.toISOString().split('T')[0];
+  if(cfg.lastCheck===ts) return;
   subs.filter(s=>!s.paused).forEach(s=>{
-    const days=daysUntil(s.renewal);
-    const nd=s.notifDays||1;
-    if(days>=0&&days<=nd){sendNotif('🔔 Rinnovo imminente',s.name+' si rinnova tra '+days+' giorno/i — €'+s.cost.toFixed(2));}
+    const d=daysTo(s.renewal);
+    if(d>=0 && d<=(s.nd||1)) sendNotif('🔔 Rinnovo imminente',s.name+' — €'+s.cost.toFixed(2)+' tra '+d+' giorno/i');
   });
-  settings.lastCheck=todayStr;saveAll();
+  cfg.lastCheck=ts; saveAll();
+}
+function updateNotifBtn(){
+  const btn=document.getElementById('notifbtn'); if(!btn) return;
+  btn.style.color=cfg.notif&&'Notification' in window&&Notification.permission==='granted'?'var(--grn)':'var(--tx)';
 }
 
-function updateNotifBtn(){
-  const btn=document.getElementById('notif-btn');if(!btn)return;
-  btn.style.color=settings.enabled&&Notification.permission==='granted'?'var(--ok)':'var(--text)';
-}
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function drawAll(){ drawOverview(); drawList(); drawCalendar(); drawHistory(); }
 
 updateNotifBtn();
 checkNotifs();
-renderAll();
+drawAll();
 </script>
 </body>
 </html>
